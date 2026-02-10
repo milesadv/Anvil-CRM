@@ -15,7 +15,7 @@ export function UpcomingTasks({ activities, contacts }: UpcomingTasksProps) {
   return (
     <div>
       <div className="flex items-baseline justify-between">
-        <p className="text-sm text-muted-foreground">Upcoming</p>
+        <p className="text-base font-medium text-foreground">Upcoming</p>
         <p className="text-xs tabular-nums text-muted-foreground">
           {upcoming.length} pending
         </p>

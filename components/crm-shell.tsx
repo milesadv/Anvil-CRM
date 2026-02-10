@@ -122,13 +122,13 @@ export function CrmShell() {
             {activeView === "overview" && (
               <>
                 <PageHeader title="Overview" />
-                <div className="flex flex-col gap-px px-6 pb-8">
+                <div className="flex flex-col px-6 pb-8">
                   <StatCards contacts={contacts} deals={deals} />
-                  <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-2">
                     <PipelineChart deals={deals} />
                     <RecentActivity activities={activities} contacts={contacts} />
                   </div>
-                  <div className="mt-6">
+                  <div className="mt-10">
                     <UpcomingTasks activities={activities} contacts={contacts} />
                   </div>
                 </div>

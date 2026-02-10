@@ -20,7 +20,7 @@ export function PipelineChart({ deals }: PipelineChartProps) {
 
   return (
     <div>
-      <p className="text-sm text-muted-foreground">Pipeline breakdown</p>
+      <p className="text-base font-medium text-foreground">Pipeline breakdown</p>
       {deals.length === 0 ? (
         <p className="mt-6 text-base text-muted-foreground/50">No deals in the pipeline yet</p>
       ) : (
@@ -33,9 +33,9 @@ export function PipelineChart({ deals }: PipelineChartProps) {
                   {stage.label}
                 </span>
                 <div className="relative flex-1">
-                  <div className="h-5 w-full overflow-hidden bg-secondary">
+                  <div className="h-5 w-full overflow-hidden rounded-sm bg-secondary">
                     <div
-                      className="h-full bg-foreground/20 transition-all duration-700"
+                      className="h-full rounded-sm bg-foreground/25 transition-all duration-500"
                       style={{ width: `${widthPercent}%` }}
                     />
                   </div>

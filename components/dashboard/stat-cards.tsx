@@ -30,7 +30,7 @@ export function StatCards({ contacts, deals }: StatCardsProps) {
       {stats.map((stat) => (
         <div key={stat.label}>
           <p className="text-sm text-muted-foreground">{stat.label}</p>
-          <p className="mt-2 text-3xl font-light tabular-nums leading-none tracking-tight text-foreground">
+          <p className="mt-2 text-3xl font-normal tabular-nums leading-none tracking-tight text-foreground">
             {stat.value}
           </p>
         </div>

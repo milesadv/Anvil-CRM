@@ -11,7 +11,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)'],
+        sans: ['var(--font-geist-sans)'],
+        mono: ['var(--font-geist-mono)'],
       },
       fontSize: {
         '2xs': ['10px', { lineHeight: '1' }],
@@ -20,7 +21,8 @@ const config: Config = {
         base: ['13px', { lineHeight: '1.5' }],
         lg: ['15px', { lineHeight: '1.4' }],
         xl: ['20px', { lineHeight: '1.2' }],
-        '3xl': ['32px', { lineHeight: '1' }],
+        '2xl': ['26px', { lineHeight: '1.15' }],
+        '3xl': ['36px', { lineHeight: '1' }],
       },
       colors: {
         background: 'hsl(var(--background))',

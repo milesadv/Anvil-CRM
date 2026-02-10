@@ -14,7 +14,7 @@ export function RecentActivity({ activities, contacts }: RecentActivityProps) {
 
   return (
     <div>
-      <p className="text-sm text-muted-foreground">Recent activity</p>
+      <p className="text-base font-medium text-foreground">Recent activity</p>
       {sorted.length === 0 ? (
         <p className="mt-6 text-base text-muted-foreground/50">No activity logged yet</p>
       ) : (

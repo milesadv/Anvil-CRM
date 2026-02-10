@@ -12,12 +12,12 @@ export function PageHeader({ title, description, children, className }: PageHead
   return (
     <div
       className={cn(
-        "flex items-end justify-between px-6 pb-6 pt-8",
+        "flex items-end justify-between px-6 pb-8 pt-10",
         className
       )}
     >
       <div>
-        <h1 className="text-xl font-medium tracking-tight text-foreground">
+        <h1 className="text-2xl font-medium tracking-tight text-foreground">
           {title}
         </h1>
         {description && (
