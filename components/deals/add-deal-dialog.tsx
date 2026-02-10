@@ -1,69 +1,83 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import type { Contact } from "@/lib/crm-data"
-import { supabase } from "@/lib/supabase"
+} from "@/components/ui/select";
+import type { Contact } from "@/lib/crm-data";
+import { createBrowserClient } from "@/lib/supabase";
 
 interface AddDealDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  contacts: Contact[]
-  onDealAdded: () => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  contacts: Contact[];
+  onDealAdded: () => void;
 }
 
-export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: AddDealDialogProps) {
-  const [title, setTitle] = useState("")
-  const [amount, setAmount] = useState("")
-  const [probability, setProbability] = useState("50")
-  const [contactId, setContactId] = useState("")
-  const [stage, setStage] = useState<"discovery" | "pricing" | "negotiating" | "closing">("discovery")
-  const [expectedCloseDate, setExpectedCloseDate] = useState("")
-  const [saving, setSaving] = useState(false)
+export function AddDealDialog({
+  open,
+  onOpenChange,
+  contacts,
+  onDealAdded,
+}: AddDealDialogProps) {
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState("");
+  const [probability, setProbability] = useState("50");
+  const [contactId, setContactId] = useState("");
+  const [stage, setStage] = useState<
+    "discovery" | "pricing" | "negotiating" | "closing"
+  >("discovery");
+  const [expectedCloseDate, setExpectedCloseDate] = useState("");
+  const [saving, setSaving] = useState(false);
 
   function reset() {
-    setTitle("")
-    setAmount("")
-    setProbability("50")
-    setContactId("")
-    setStage("discovery")
-    setExpectedCloseDate("")
+    setTitle("");
+    setAmount("");
+    setProbability("50");
+    setContactId("");
+    setStage("discovery");
+    setExpectedCloseDate("");
   }
 
   async function handleSubmit() {
-    if (!title || !amount || !contactId) return
+    if (!title || !amount || !contactId) return;
 
-    setSaving(true)
+    const supabase = createBrowserClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    setSaving(true);
     const { error } = await supabase.from("deals").insert({
+      user_id: user.id,
       title,
       amount: parseFloat(amount),
       stage,
       probability: parseInt(probability, 10) || 50,
       contact_id: contactId,
       expected_close_date: expectedCloseDate || null,
-    })
-    setSaving(false)
+    });
+    setSaving(false);
 
     if (!error) {
-      reset()
-      onOpenChange(false)
-      onDealAdded()
+      reset();
+      onOpenChange(false);
+      onDealAdded();
     }
   }
 
@@ -71,11 +85,16 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="border-border bg-card sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle className="text-lg font-medium text-foreground">New deal</DialogTitle>
+          <DialogTitle className="text-lg font-medium text-foreground">
+            New deal
+          </DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-3">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="dealTitle" className="text-xs text-muted-foreground">
+            <Label
+              htmlFor="dealTitle"
+              className="text-xs text-muted-foreground"
+            >
               Title
             </Label>
             <Input
@@ -87,7 +106,10 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="dealAmount" className="text-xs text-muted-foreground">
+              <Label
+                htmlFor="dealAmount"
+                className="text-xs text-muted-foreground"
+              >
                 {"Amount (\u00A3)"}
               </Label>
               <Input
@@ -99,7 +121,10 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="probability" className="text-xs text-muted-foreground">
+              <Label
+                htmlFor="probability"
+                className="text-xs text-muted-foreground"
+              >
                 Probability (%)
               </Label>
               <Input
@@ -134,7 +159,10 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
           </div>
           <div className="flex flex-col gap-1.5">
             <Label className="text-xs text-muted-foreground">Stage</Label>
-            <Select value={stage} onValueChange={(v) => setStage(v as typeof stage)}>
+            <Select
+              value={stage}
+              onValueChange={(v) => setStage(v as typeof stage)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -147,7 +175,10 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
             </Select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="expectedCloseDate" className="text-xs text-muted-foreground">
+            <Label
+              htmlFor="expectedCloseDate"
+              className="text-xs text-muted-foreground"
+            >
               Expected close
             </Label>
             <Input
@@ -178,5 +209,5 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

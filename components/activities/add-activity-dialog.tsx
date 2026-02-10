@@ -1,67 +1,81 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import type { Contact } from "@/lib/crm-data"
-import { supabase } from "@/lib/supabase"
+} from "@/components/ui/select";
+import type { Contact } from "@/lib/crm-data";
+import { createBrowserClient } from "@/lib/supabase";
 
 interface AddActivityDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  contacts: Contact[]
-  onActivityAdded: () => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  contacts: Contact[];
+  onActivityAdded: () => void;
 }
 
-export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdded }: AddActivityDialogProps) {
-  const [type, setType] = useState<"call" | "email" | "meeting" | "note" | "task">("call")
-  const [title, setTitle] = useState("")
-  const [contactId, setContactId] = useState("")
-  const [description, setDescription] = useState("")
-  const [dueDate, setDueDate] = useState("")
-  const [saving, setSaving] = useState(false)
+export function AddActivityDialog({
+  open,
+  onOpenChange,
+  contacts,
+  onActivityAdded,
+}: AddActivityDialogProps) {
+  const [type, setType] = useState<
+    "call" | "email" | "meeting" | "note" | "task"
+  >("call");
+  const [title, setTitle] = useState("");
+  const [contactId, setContactId] = useState("");
+  const [description, setDescription] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [saving, setSaving] = useState(false);
 
   function reset() {
-    setType("call")
-    setTitle("")
-    setContactId("")
-    setDescription("")
-    setDueDate("")
+    setType("call");
+    setTitle("");
+    setContactId("");
+    setDescription("");
+    setDueDate("");
   }
 
   async function handleSubmit() {
-    if (!title || !contactId) return
+    if (!title || !contactId) return;
 
-    setSaving(true)
+    const supabase = createBrowserClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    setSaving(true);
     const { error } = await supabase.from("activities").insert({
+      user_id: user.id,
       type,
       title,
       description,
       contact_id: contactId,
       due_date: dueDate || null,
-    })
-    setSaving(false)
+    });
+    setSaving(false);
 
     if (!error) {
-      reset()
-      onOpenChange(false)
-      onActivityAdded()
+      reset();
+      onOpenChange(false);
+      onActivityAdded();
     }
   }
 
@@ -76,7 +90,10 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
         <div className="grid gap-4 py-3">
           <div className="flex flex-col gap-1.5">
             <Label className="text-xs text-muted-foreground">Type</Label>
-            <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
+            <Select
+              value={type}
+              onValueChange={(v) => setType(v as typeof type)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -90,7 +107,10 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
             </Select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="activityTitle" className="text-xs text-muted-foreground">
+            <Label
+              htmlFor="activityTitle"
+              className="text-xs text-muted-foreground"
+            >
               Title
             </Label>
             <Input
@@ -122,7 +142,10 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
             </Select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="activityDesc" className="text-xs text-muted-foreground">
+            <Label
+              htmlFor="activityDesc"
+              className="text-xs text-muted-foreground"
+            >
               Description
             </Label>
             <Textarea
@@ -133,7 +156,10 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="activityDueDate" className="text-xs text-muted-foreground">
+            <Label
+              htmlFor="activityDueDate"
+              className="text-xs text-muted-foreground"
+            >
               Due date
             </Label>
             <Input
@@ -164,5 +190,5 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
