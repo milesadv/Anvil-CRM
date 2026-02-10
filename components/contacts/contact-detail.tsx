@@ -15,11 +15,12 @@ interface ContactDetailProps {
   contact: Contact | null
   open: boolean
   onClose: () => void
+  onEdit: () => void
   deals: Deal[]
   activities: Activity[]
 }
 
-export function ContactDetail({ contact, open, onClose, deals, activities }: ContactDetailProps) {
+export function ContactDetail({ contact, open, onClose, onEdit, deals, activities }: ContactDetailProps) {
   const contactDeals = contact ? deals.filter((d) => d.contactId === contact.id) : []
   const contactActivities = contact ? activities.filter((a) => a.contactId === contact.id) : []
 
@@ -87,6 +88,13 @@ export function ContactDetail({ contact, open, onClose, deals, activities }: Con
                 >
                   Call
                 </a>
+                <button
+                  type="button"
+                  onClick={onEdit}
+                  className="flex-1 rounded-md bg-secondary py-2 text-center text-sm text-foreground transition-colors hover:bg-accent"
+                >
+                  Edit
+                </button>
               </div>
             </div>
 

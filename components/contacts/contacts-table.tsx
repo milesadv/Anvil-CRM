@@ -10,6 +10,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ContactDetail } from "./contact-detail"
 import { AddContactDialog } from "./add-contact-dialog"
+import { EditContactDialog } from "./edit-contact-dialog"
 
 const statusFilters: { label: string; value: ContactStatus | "all" }[] = [
   { label: "All", value: "all" },
@@ -31,6 +32,8 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
   const [statusFilter, setStatusFilter] = useState<ContactStatus | "all">("all")
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
   const [addOpen, setAddOpen] = useState(false)
+  const [editContact, setEditContact] = useState<Contact | null>(null)
+  const [editOpen, setEditOpen] = useState(false)
 
   const filtered = contacts.filter((c) => {
     const matchesSearch =
@@ -160,11 +163,17 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
         contact={selectedContact}
         open={!!selectedContact}
         onClose={() => setSelectedContact(null)}
+        onEdit={() => {
+          setEditContact(selectedContact)
+          setSelectedContact(null)
+          setEditOpen(true)
+        }}
         deals={deals}
         activities={activities}
       />
 
       <AddContactDialog open={addOpen} onOpenChange={setAddOpen} onContactAdded={onContactAdded} />
+      <EditContactDialog contact={editContact} open={editOpen} onOpenChange={setEditOpen} onContactUpdated={onContactAdded} />
     </>
   )
 }
