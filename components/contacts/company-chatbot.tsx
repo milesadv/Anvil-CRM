@@ -305,32 +305,56 @@ export function CompanyChatbot({
   /* ---- Supabase: load saved brief ---- */
   async function loadBrief(): Promise<string | null> {
     const supabase = createBrowserClient();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("company_intel")
       .select("brief")
       .eq("contact_id", contact.id)
+      .order("updated_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
+    if (error) {
+      console.warn("[CompanyChatbot] loadBrief error:", error.message);
+      return null;
+    }
     return data?.brief || null;
   }
 
-  /* ---- Supabase: save/update brief ---- */
-  async function saveBrief(brief: string) {
-    const supabase = createBrowserClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
+  /* ---- Supabase: save/update brief (shared — one brief per contact) ---- */
+  async function saveBrief(
+    brief: string,
+    forContactId: string,
+    forWebsite: string,
+  ) {
+    try {
+      const supabase = createBrowserClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        console.warn("[CompanyChatbot] saveBrief: no user session");
+        return;
+      }
 
-    await supabase.from("company_intel").upsert(
-      {
+      // Delete any existing briefs for this contact (from any user)
+      await supabase
+        .from("company_intel")
+        .delete()
+        .eq("contact_id", forContactId);
+
+      // Insert fresh
+      const { error } = await supabase.from("company_intel").insert({
         user_id: user.id,
-        contact_id: contact.id,
+        contact_id: forContactId,
         brief,
-        website_used: contact.website,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,contact_id" },
-    );
+        website_used: forWebsite,
+      });
+
+      if (error) {
+        console.error("[CompanyChatbot] saveBrief failed:", error.message);
+      }
+    } catch (err) {
+      console.error("[CompanyChatbot] saveBrief exception:", err);
+    }
   }
 
   /* ---- Call edge function ---- */
@@ -339,6 +363,9 @@ export function CompanyChatbot({
     persistBrief: boolean,
   ) {
     const c = contactRef.current;
+    // Capture contact identity at call time so the save targets the right row
+    const capturedContactId = c.id;
+    const capturedWebsite = c.website;
     const supabase = createBrowserClient();
 
     startThinking();
@@ -451,10 +478,14 @@ export function CompanyChatbot({
         }
       }
 
-      // Persist the initial brief to Supabase
-      if (persistBrief && responseText && !abortRef.current) {
-        setSavedBrief(responseText);
-        saveBrief(responseText);
+      // Persist the initial brief to Supabase — always save if we got text,
+      // even if the component is unmounting (the brief was successfully generated).
+      // Uses captured contact values so it saves to the correct row.
+      if (persistBrief && responseText) {
+        if (!abortRef.current) {
+          setSavedBrief(responseText);
+        }
+        saveBrief(responseText, capturedContactId, capturedWebsite);
       }
     } catch (err) {
       stopThinking();
@@ -650,7 +681,7 @@ export function CompanyChatbot({
   const messagesContent = (
     <div
       className={cn(
-        "flex-1 overflow-y-auto pt-6 pb-4 min-w-0",
+        "flex-1 overflow-y-auto pt-6 pb-4 min-w-0 overscroll-contain",
         embedded ? "px-5" : "px-7",
       )}
     >

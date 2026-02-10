@@ -119,7 +119,7 @@ export function ContactDetail({
         )}
 
         {/* Content area — scrollable */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto overscroll-contain">
           {/* Details tab (always visible on desktop, toggled on mobile) */}
           <div className={cn(mobileTab !== "details" && "hidden sm:block")}>
             {/* Name */}
