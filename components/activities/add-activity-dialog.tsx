@@ -30,7 +30,7 @@ interface AddActivityDialogProps {
 }
 
 export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdded }: AddActivityDialogProps) {
-  const [type, setType] = useState("call")
+  const [type, setType] = useState<"call" | "email" | "meeting" | "note" | "task">("call")
   const [title, setTitle] = useState("")
   const [contactId, setContactId] = useState("")
   const [description, setDescription] = useState("")
@@ -76,7 +76,7 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
         <div className="grid gap-4 py-3">
           <div className="flex flex-col gap-1.5">
             <Label className="text-[11px] text-muted-foreground">Type</Label>
-            <Select value={type} onValueChange={setType}>
+            <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
               <SelectTrigger className="h-9 border-border bg-secondary text-[13px] text-foreground">
                 <SelectValue />
               </SelectTrigger>

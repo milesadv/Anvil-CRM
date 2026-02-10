@@ -33,7 +33,7 @@ export function AddContactDialog({ open, onOpenChange, onContactAdded }: AddCont
   const [phone, setPhone] = useState("")
   const [company, setCompany] = useState("")
   const [role, setRole] = useState("")
-  const [status, setStatus] = useState("lead")
+  const [status, setStatus] = useState<"lead" | "prospect" | "customer" | "churned">("lead")
   const [saving, setSaving] = useState(false)
 
   function reset() {
@@ -107,7 +107,7 @@ export function AddContactDialog({ open, onOpenChange, onContactAdded }: AddCont
           </div>
           <div className="flex flex-col gap-1.5">
             <Label className="text-[11px] text-muted-foreground">Status</Label>
-            <Select value={status} onValueChange={setStatus}>
+            <Select value={status} onValueChange={(v) => setStatus(v as typeof status)}>
               <SelectTrigger className="h-9 border-border bg-secondary text-[13px] text-foreground">
                 <SelectValue />
               </SelectTrigger>

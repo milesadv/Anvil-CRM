@@ -33,7 +33,7 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
   const [amount, setAmount] = useState("")
   const [probability, setProbability] = useState("50")
   const [contactId, setContactId] = useState("")
-  const [stage, setStage] = useState("prospecting")
+  const [stage, setStage] = useState<"prospecting" | "qualification" | "proposal" | "negotiation" | "closed_won" | "closed_lost">("prospecting")
   const [expectedCloseDate, setExpectedCloseDate] = useState("")
   const [saving, setSaving] = useState(false)
 
@@ -137,7 +137,7 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
           </div>
           <div className="flex flex-col gap-1.5">
             <Label className="text-[11px] text-muted-foreground">Stage</Label>
-            <Select value={stage} onValueChange={setStage}>
+            <Select value={stage} onValueChange={(v) => setStage(v as typeof stage)}>
               <SelectTrigger className="h-9 border-border bg-secondary text-[13px] text-foreground">
                 <SelectValue />
               </SelectTrigger>

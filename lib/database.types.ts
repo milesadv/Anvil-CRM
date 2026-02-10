@@ -38,6 +38,7 @@ export type Database = {
           avatar?: string
           created_at?: string
         }
+        Relationships: []
       }
       deals: {
         Row: {
@@ -70,6 +71,7 @@ export type Database = {
           expected_close_date?: string | null
           created_at?: string
         }
+        Relationships: []
       }
       activities: {
         Row: {
@@ -105,6 +107,7 @@ export type Database = {
           due_date?: string | null
           created_at?: string
         }
+        Relationships: []
       }
     }
     Views: Record<string, never>
