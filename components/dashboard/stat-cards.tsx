@@ -8,14 +8,14 @@ interface StatCardsProps {
 
 export function StatCards({ contacts, deals }: StatCardsProps) {
   const totalPipeline = deals
-    .filter((d) => d.stage !== "closed")
-    .reduce((sum, d) => sum + d.value, 0)
+    .filter((d) => d.stage !== "closed_won" && d.stage !== "closed_lost")
+    .reduce((sum, d) => sum + d.amount, 0)
 
   const closedRevenue = deals
-    .filter((d) => d.stage === "closed")
-    .reduce((sum, d) => sum + d.value, 0)
+    .filter((d) => d.stage === "closed_won")
+    .reduce((sum, d) => sum + d.amount, 0)
 
-  const activeDeals = deals.filter((d) => d.stage !== "closed").length
+  const activeDeals = deals.filter((d) => d.stage !== "closed_won" && d.stage !== "closed_lost").length
   const totalContacts = contacts.length
 
   const stats = [

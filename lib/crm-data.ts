@@ -1,6 +1,6 @@
 // CRM Types
 export type ContactStatus = "lead" | "prospect" | "customer" | "churned"
-export type DealStage = "discovery-call" | "pricing" | "negotiation" | "closed"
+export type DealStage = "prospecting" | "qualification" | "proposal" | "negotiation" | "closed_won" | "closed_lost"
 export type ActivityType = "call" | "email" | "meeting" | "note" | "task"
 export type Priority = "low" | "medium" | "high"
 
@@ -19,13 +19,11 @@ export interface Contact {
 export interface Deal {
   id: string
   title: string
-  company: string
-  value: number
+  amount: number
   stage: DealStage
   probability: number
   contactId: string
-  contactName: string
-  expectedClose: string
+  expectedCloseDate: string | null
   createdAt: string
 }
 
@@ -34,10 +32,11 @@ export interface Activity {
   type: ActivityType
   title: string
   description: string
-  contactName: string
   contactId: string
-  date: string
+  dealId: string | null
+  dueDate: string | null
   completed: boolean
+  createdAt: string
 }
 
 // Utility functions
@@ -71,9 +70,15 @@ export function getRelativeDate(dateStr: string): string {
   return `${Math.floor(diffDays / 30)} months ago`
 }
 
+export function getContactName(contactId: string, contacts: Contact[]): string {
+  return contacts.find((c) => c.id === contactId)?.name ?? ""
+}
+
 export const stageLabels: Record<DealStage, string> = {
-  "discovery-call": "Discovery Call",
-  pricing: "Pricing",
+  prospecting: "Prospecting",
+  qualification: "Qualification",
+  proposal: "Proposal",
   negotiation: "Negotiation",
-  closed: "Closed",
+  closed_won: "Closed Won",
+  closed_lost: "Closed Lost",
 }

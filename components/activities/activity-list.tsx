@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { getRelativeDate } from "@/lib/crm-data"
+import { getRelativeDate, getContactName } from "@/lib/crm-data"
 import type { Activity, ActivityType, Contact } from "@/lib/crm-data"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
@@ -20,22 +20,24 @@ const typeFilters: { label: string; value: ActivityType | "all" }[] = [
 interface ActivityListProps {
   activities: Activity[]
   contacts: Contact[]
+  onActivityAdded: () => void
 }
 
-export function ActivityList({ activities, contacts }: ActivityListProps) {
+export function ActivityList({ activities, contacts, onActivityAdded }: ActivityListProps) {
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<ActivityType | "all">("all")
   const [addOpen, setAddOpen] = useState(false)
 
   const filtered = activities
     .filter((a) => {
+      const contactName = getContactName(a.contactId, contacts)
       const matchesSearch =
         a.title.toLowerCase().includes(search.toLowerCase()) ||
-        a.contactName.toLowerCase().includes(search.toLowerCase())
+        contactName.toLowerCase().includes(search.toLowerCase())
       const matchesType = typeFilter === "all" || a.type === typeFilter
       return matchesSearch && matchesType
     })
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
   return (
     <>
@@ -109,7 +111,7 @@ export function ActivityList({ activities, contacts }: ActivityListProps) {
                         {activity.title}
                       </p>
                       <p className="mt-0.5 text-[11px] text-muted-foreground">
-                        {activity.contactName}
+                        {getContactName(activity.contactId, contacts)}
                       </p>
                     </div>
                     <div className="flex flex-shrink-0 items-center gap-4">
@@ -119,13 +121,15 @@ export function ActivityList({ activities, contacts }: ActivityListProps) {
                         <span className="text-[11px] text-muted-foreground/60">Open</span>
                       )}
                       <span className="text-[11px] tabular-nums text-muted-foreground">
-                        {getRelativeDate(activity.date)}
+                        {getRelativeDate(activity.createdAt)}
                       </span>
                     </div>
                   </div>
-                  <p className="mt-1.5 text-[12px] leading-relaxed text-muted-foreground">
-                    {activity.description}
-                  </p>
+                  {activity.description && (
+                    <p className="mt-1.5 text-[12px] leading-relaxed text-muted-foreground">
+                      {activity.description}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
@@ -138,7 +142,7 @@ export function ActivityList({ activities, contacts }: ActivityListProps) {
         )}
       </div>
 
-      <AddActivityDialog open={addOpen} onOpenChange={setAddOpen} contacts={contacts} />
+      <AddActivityDialog open={addOpen} onOpenChange={setAddOpen} contacts={contacts} onActivityAdded={onActivityAdded} />
     </>
   )
 }

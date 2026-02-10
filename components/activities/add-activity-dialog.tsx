@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -19,14 +20,51 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import type { Contact } from "@/lib/crm-data"
+import { supabase } from "@/lib/supabase"
 
 interface AddActivityDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   contacts: Contact[]
+  onActivityAdded: () => void
 }
 
-export function AddActivityDialog({ open, onOpenChange, contacts }: AddActivityDialogProps) {
+export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdded }: AddActivityDialogProps) {
+  const [type, setType] = useState("call")
+  const [title, setTitle] = useState("")
+  const [contactId, setContactId] = useState("")
+  const [description, setDescription] = useState("")
+  const [dueDate, setDueDate] = useState("")
+  const [saving, setSaving] = useState(false)
+
+  function reset() {
+    setType("call")
+    setTitle("")
+    setContactId("")
+    setDescription("")
+    setDueDate("")
+  }
+
+  async function handleSubmit() {
+    if (!title || !contactId) return
+
+    setSaving(true)
+    const { error } = await supabase.from("activities").insert({
+      type,
+      title,
+      description,
+      contact_id: contactId,
+      due_date: dueDate || null,
+    })
+    setSaving(false)
+
+    if (!error) {
+      reset()
+      onOpenChange(false)
+      onActivityAdded()
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="border-border bg-card sm:max-w-[400px]">
@@ -38,7 +76,7 @@ export function AddActivityDialog({ open, onOpenChange, contacts }: AddActivityD
         <div className="grid gap-4 py-3">
           <div className="flex flex-col gap-1.5">
             <Label className="text-[11px] text-muted-foreground">Type</Label>
-            <Select defaultValue="call">
+            <Select value={type} onValueChange={setType}>
               <SelectTrigger className="h-9 border-border bg-secondary text-[13px] text-foreground">
                 <SelectValue />
               </SelectTrigger>
@@ -58,12 +96,14 @@ export function AddActivityDialog({ open, onOpenChange, contacts }: AddActivityD
             <Input
               id="activityTitle"
               placeholder="Follow-up call"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               className="h-9 border-border bg-secondary text-[13px] text-foreground placeholder:text-muted-foreground"
             />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label className="text-[11px] text-muted-foreground">Contact</Label>
-            <Select>
+            <Select value={contactId} onValueChange={setContactId}>
               <SelectTrigger className="h-9 border-border bg-secondary text-[13px] text-foreground">
                 <SelectValue placeholder="Select contact" />
               </SelectTrigger>
@@ -89,16 +129,20 @@ export function AddActivityDialog({ open, onOpenChange, contacts }: AddActivityD
             <Textarea
               id="activityDesc"
               placeholder="Add details..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               className="min-h-[80px] border-border bg-secondary text-[13px] text-foreground placeholder:text-muted-foreground"
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="activityDate" className="text-[11px] text-muted-foreground">
-              Date
+            <Label htmlFor="activityDueDate" className="text-[11px] text-muted-foreground">
+              Due date
             </Label>
             <Input
-              id="activityDate"
+              id="activityDueDate"
               type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
               className="h-9 border-border bg-secondary text-[13px] text-foreground"
             />
           </div>
@@ -114,10 +158,11 @@ export function AddActivityDialog({ open, onOpenChange, contacts }: AddActivityD
           </Button>
           <Button
             size="sm"
-            onClick={() => onOpenChange(false)}
+            onClick={handleSubmit}
+            disabled={saving || !title || !contactId}
             className="bg-foreground text-[12px] text-background hover:bg-foreground/90"
           >
-            Log activity
+            {saving ? "Logging..." : "Log activity"}
           </Button>
         </DialogFooter>
       </DialogContent>

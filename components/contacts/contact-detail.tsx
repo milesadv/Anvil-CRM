@@ -104,7 +104,7 @@ export function ContactDetail({ contact, open, onClose, deals, activities }: Con
                     <p className="text-[11px] text-muted-foreground">{stageLabels[deal.stage]}</p>
                   </div>
                   <span className="text-[13px] tabular-nums text-foreground">
-                    {formatCurrency(deal.value)}
+                    {formatCurrency(deal.amount)}
                   </span>
                 </div>
               ))
@@ -131,7 +131,7 @@ export function ContactDetail({ contact, open, onClose, deals, activities }: Con
                     <p className="text-[11px] capitalize text-muted-foreground">{activity.type}</p>
                   </div>
                   <span className="text-[11px] tabular-nums text-muted-foreground">
-                    {getRelativeDate(activity.date)}
+                    {getRelativeDate(activity.createdAt)}
                   </span>
                 </div>
               ))

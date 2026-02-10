@@ -1,15 +1,16 @@
-import { formatDate } from "@/lib/crm-data"
-import type { Activity } from "@/lib/crm-data"
+import { formatDate, getContactName } from "@/lib/crm-data"
+import type { Activity, Contact } from "@/lib/crm-data"
 import { cn } from "@/lib/utils"
 
 interface UpcomingTasksProps {
   activities: Activity[]
+  contacts: Contact[]
 }
 
-export function UpcomingTasks({ activities }: UpcomingTasksProps) {
+export function UpcomingTasks({ activities, contacts }: UpcomingTasksProps) {
   const upcoming = activities
-    .filter((a) => !a.completed)
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .filter((a) => !a.completed && a.dueDate)
+    .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime())
 
   return (
     <div>
@@ -26,7 +27,7 @@ export function UpcomingTasks({ activities }: UpcomingTasksProps) {
           {upcoming.map((task) => {
             const today = new Date()
             today.setHours(0, 0, 0, 0)
-            const taskDate = new Date(task.date)
+            const taskDate = new Date(task.dueDate!)
             taskDate.setHours(0, 0, 0, 0)
             const diffDays = Math.round((taskDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
             const isToday = diffDays === 0
@@ -49,7 +50,9 @@ export function UpcomingTasks({ activities }: UpcomingTasksProps) {
                 />
                 <div className="min-w-0 flex-1">
                   <p className="text-[13px] text-foreground">{task.title}</p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">{task.contactName}</p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    {getContactName(task.contactId, contacts)}
+                  </p>
                 </div>
                 <span
                   className={cn(
@@ -57,7 +60,7 @@ export function UpcomingTasks({ activities }: UpcomingTasksProps) {
                     isToday ? "text-primary" : "text-muted-foreground"
                   )}
                 >
-                  {isToday ? "Today" : isTomorrow ? "Tomorrow" : formatDate(task.date)}
+                  {isToday ? "Today" : isTomorrow ? "Tomorrow" : formatDate(task.dueDate!)}
                 </span>
               </div>
             )

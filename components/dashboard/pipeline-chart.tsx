@@ -3,7 +3,7 @@
 import { formatCurrency, stageLabels } from "@/lib/crm-data"
 import type { Deal, DealStage } from "@/lib/crm-data"
 
-const stages: DealStage[] = ["discovery-call", "pricing", "negotiation", "closed"]
+const stages: DealStage[] = ["prospecting", "qualification", "proposal", "negotiation", "closed_won", "closed_lost"]
 
 interface PipelineChartProps {
   deals: Deal[]
@@ -12,7 +12,7 @@ interface PipelineChartProps {
 export function PipelineChart({ deals }: PipelineChartProps) {
   const stageData = stages.map((key) => {
     const stageDeals = deals.filter((d) => d.stage === key)
-    const total = stageDeals.reduce((sum, d) => sum + d.value, 0)
+    const total = stageDeals.reduce((sum, d) => sum + d.amount, 0)
     return { key, label: stageLabels[key], count: stageDeals.length, total }
   })
 

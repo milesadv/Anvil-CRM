@@ -1,14 +1,15 @@
-import { getRelativeDate } from "@/lib/crm-data"
-import type { Activity } from "@/lib/crm-data"
+import { getRelativeDate, getContactName } from "@/lib/crm-data"
+import type { Activity, Contact } from "@/lib/crm-data"
 import { cn } from "@/lib/utils"
 
 interface RecentActivityProps {
   activities: Activity[]
+  contacts: Contact[]
 }
 
-export function RecentActivity({ activities }: RecentActivityProps) {
+export function RecentActivity({ activities, contacts }: RecentActivityProps) {
   const sorted = [...activities].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
 
   return (
@@ -37,7 +38,7 @@ export function RecentActivity({ activities }: RecentActivityProps) {
                   <span className="text-[11px] text-emerald-400">Done</span>
                 )}
                 <span className="text-[11px] tabular-nums text-muted-foreground">
-                  {getRelativeDate(activity.date)}
+                  {getRelativeDate(activity.createdAt)}
                 </span>
               </div>
             </div>

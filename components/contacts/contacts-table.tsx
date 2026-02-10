@@ -21,9 +21,10 @@ interface ContactsTableProps {
   contacts: Contact[]
   deals: Deal[]
   activities: Activity[]
+  onContactAdded: () => void
 }
 
-export function ContactsTable({ contacts, deals, activities }: ContactsTableProps) {
+export function ContactsTable({ contacts, deals, activities, onContactAdded }: ContactsTableProps) {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<ContactStatus | "all">("all")
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
@@ -164,7 +165,7 @@ export function ContactsTable({ contacts, deals, activities }: ContactsTableProp
         activities={activities}
       />
 
-      <AddContactDialog open={addOpen} onOpenChange={setAddOpen} />
+      <AddContactDialog open={addOpen} onOpenChange={setAddOpen} onContactAdded={onContactAdded} />
     </>
   )
 }
