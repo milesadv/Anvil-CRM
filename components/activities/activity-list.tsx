@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { getRelativeDate, getContactName } from "@/lib/crm-data"
-import type { Activity, ActivityType, Contact } from "@/lib/crm-data"
-import { cn } from "@/lib/utils"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { AddActivityDialog } from "./add-activity-dialog"
+import { useState } from "react";
+import { getRelativeDate, getContactName } from "@/lib/crm-data";
+import type { Activity, ActivityType, Contact } from "@/lib/crm-data";
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { AddActivityDialog } from "./add-activity-dialog";
 
 const typeFilters: { label: string; value: ActivityType | "all" }[] = [
   { label: "All", value: "all" },
@@ -15,29 +15,36 @@ const typeFilters: { label: string; value: ActivityType | "all" }[] = [
   { label: "Meetings", value: "meeting" },
   { label: "Notes", value: "note" },
   { label: "Tasks", value: "task" },
-]
+];
 
 interface ActivityListProps {
-  activities: Activity[]
-  contacts: Contact[]
-  onActivityAdded: () => void
+  activities: Activity[];
+  contacts: Contact[];
+  onActivityAdded: () => void;
 }
 
-export function ActivityList({ activities, contacts, onActivityAdded }: ActivityListProps) {
-  const [search, setSearch] = useState("")
-  const [typeFilter, setTypeFilter] = useState<ActivityType | "all">("all")
-  const [addOpen, setAddOpen] = useState(false)
+export function ActivityList({
+  activities,
+  contacts,
+  onActivityAdded,
+}: ActivityListProps) {
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState<ActivityType | "all">("all");
+  const [addOpen, setAddOpen] = useState(false);
 
   const filtered = activities
     .filter((a) => {
-      const contactName = getContactName(a.contactId, contacts)
+      const contactName = getContactName(a.contactId, contacts);
       const matchesSearch =
         a.title.toLowerCase().includes(search.toLowerCase()) ||
-        contactName.toLowerCase().includes(search.toLowerCase())
-      const matchesType = typeFilter === "all" || a.type === typeFilter
-      return matchesSearch && matchesType
+        contactName.toLowerCase().includes(search.toLowerCase());
+      const matchesType = typeFilter === "all" || a.type === typeFilter;
+      return matchesSearch && matchesType;
     })
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
 
   return (
     <>
@@ -53,7 +60,7 @@ export function ActivityList({ activities, contacts, onActivityAdded }: Activity
                 "whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs transition-all duration-150",
                 typeFilter === filter.value
                   ? "bg-secondary text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {filter.label}
@@ -92,8 +99,8 @@ export function ActivityList({ activities, contacts, onActivityAdded }: Activity
               <div
                 key={activity.id}
                 className={cn(
-                  "flex items-start gap-3 py-3.5",
-                  i < filtered.length - 1 && "border-b border-border/30"
+                  "flex items-start gap-3 rounded-lg px-2 py-3.5 transition-all duration-150 hover:bg-card/40",
+                  i < filtered.length - 1 && "border-b border-border/30",
                 )}
               >
                 <span className="mt-0.5 inline-flex w-14 flex-shrink-0 items-center justify-center rounded-md bg-secondary/50 px-1.5 py-0.5 text-2xs capitalize text-muted-foreground">
@@ -105,7 +112,8 @@ export function ActivityList({ activities, contacts, onActivityAdded }: Activity
                       <p
                         className={cn(
                           "text-sm text-foreground",
-                          activity.completed && "text-muted-foreground/60 line-through"
+                          activity.completed &&
+                            "text-muted-foreground/60 line-through",
                         )}
                       >
                         {activity.title}
@@ -116,9 +124,13 @@ export function ActivityList({ activities, contacts, onActivityAdded }: Activity
                     </div>
                     <div className="flex flex-shrink-0 items-center gap-3">
                       {activity.completed ? (
-                        <span className="text-2xs font-medium text-success/80">Done</span>
+                        <span className="text-2xs font-medium text-success/80">
+                          Done
+                        </span>
                       ) : (
-                        <span className="text-2xs text-muted-foreground/30">Open</span>
+                        <span className="text-2xs text-muted-foreground/30">
+                          Open
+                        </span>
                       )}
                       <span className="text-2xs tabular-nums text-muted-foreground/40">
                         {getRelativeDate(activity.createdAt)}
@@ -135,14 +147,21 @@ export function ActivityList({ activities, contacts, onActivityAdded }: Activity
             ))}
             {filtered.length === 0 && (
               <div className="flex items-center justify-center py-16">
-                <p className="text-sm text-muted-foreground/50">No activities found</p>
+                <p className="text-sm text-muted-foreground/50">
+                  No activities found
+                </p>
               </div>
             )}
           </>
         )}
       </div>
 
-      <AddActivityDialog open={addOpen} onOpenChange={setAddOpen} contacts={contacts} onActivityAdded={onActivityAdded} />
+      <AddActivityDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        contacts={contacts}
+        onActivityAdded={onActivityAdded}
+      />
     </>
-  )
+  );
 }

@@ -1,32 +1,35 @@
-"use client"
+"use client";
 
-import { formatCurrency, stageLabels } from "@/lib/crm-data"
-import type { Deal, DealStage } from "@/lib/crm-data"
+import { formatCurrency, stageLabels } from "@/lib/crm-data";
+import type { Deal, DealStage } from "@/lib/crm-data";
 
-const stages: DealStage[] = ["discovery", "pricing", "negotiating", "closing"]
+const stages: DealStage[] = ["discovery", "pricing", "negotiating", "closing"];
 
 interface PipelineChartProps {
-  deals: Deal[]
+  deals: Deal[];
 }
 
 export function PipelineChart({ deals }: PipelineChartProps) {
   const stageData = stages.map((key) => {
-    const stageDeals = deals.filter((d) => d.stage === key)
-    const total = stageDeals.reduce((sum, d) => sum + d.amount, 0)
-    return { key, label: stageLabels[key], count: stageDeals.length, total }
-  })
+    const stageDeals = deals.filter((d) => d.stage === key);
+    const total = stageDeals.reduce((sum, d) => sum + d.amount, 0);
+    return { key, label: stageLabels[key], count: stageDeals.length, total };
+  });
 
-  const maxTotal = Math.max(...stageData.map((s) => s.total), 1)
+  const maxTotal = Math.max(...stageData.map((s) => s.total), 1);
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card/50 p-5 sm:p-6">
+    <div className="rounded-xl border border-border/60 bg-card/50 p-5 transition-all duration-200 hover:border-border hover:bg-card/70 sm:p-6">
       <p className="text-sm font-medium text-foreground">Pipeline breakdown</p>
       {deals.length === 0 ? (
-        <p className="mt-8 text-center text-sm text-muted-foreground/50">No deals in the pipeline yet</p>
+        <p className="mt-8 text-center text-sm text-muted-foreground/50">
+          No deals in the pipeline yet
+        </p>
       ) : (
         <div className="mt-5 flex flex-col gap-3.5">
           {stageData.map((stage) => {
-            const widthPercent = maxTotal > 0 ? Math.max((stage.total / maxTotal) * 100, 4) : 4
+            const widthPercent =
+              maxTotal > 0 ? Math.max((stage.total / maxTotal) * 100, 4) : 4;
             return (
               <div key={stage.key} className="flex items-center gap-3 sm:gap-4">
                 <span className="w-20 flex-shrink-0 text-xs text-muted-foreground sm:w-24">
@@ -49,10 +52,10 @@ export function PipelineChart({ deals }: PipelineChartProps) {
                   </span>
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       )}
     </div>
-  )
+  );
 }

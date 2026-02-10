@@ -33,7 +33,7 @@ export function CrmNav({ activeView, onNavigate }: CrmNavProps) {
       <button
         type="button"
         onClick={handleSignOut}
-        className="absolute right-4 top-5 text-2xs text-white/30 transition-colors hover:text-white/60 sm:right-6 sm:top-6"
+        className="absolute right-4 top-5 rounded-md px-2 py-1 text-2xs text-white/30 transition-all duration-200 hover:bg-white/[0.04] hover:text-white/60 sm:right-6 sm:top-6"
       >
         Sign out
       </button>

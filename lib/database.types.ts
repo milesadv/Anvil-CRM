@@ -10,6 +10,7 @@ export type Database = {
           company: string;
           role: string;
           phone: string;
+          website: string;
           status: "lead" | "prospect" | "customer" | "churned";
           last_contact: string;
           avatar: string;
@@ -24,6 +25,7 @@ export type Database = {
           company?: string;
           role?: string;
           phone?: string;
+          website?: string;
           status?: "lead" | "prospect" | "customer" | "churned";
           last_contact?: string;
           avatar?: string;
@@ -38,6 +40,7 @@ export type Database = {
           company?: string;
           role?: string;
           phone?: string;
+          website?: string;
           status?: "lead" | "prospect" | "customer" | "churned";
           last_contact?: string;
           avatar?: string;
@@ -118,6 +121,36 @@ export type Database = {
           completed?: boolean;
           due_date?: string | null;
           created_at?: string;
+        };
+        Relationships: [];
+      };
+      company_intel: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          contact_id: string;
+          brief: string;
+          website_used: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          contact_id: string;
+          brief: string;
+          website_used?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          contact_id?: string;
+          brief?: string;
+          website_used?: string;
+          created_at?: string;
+          updated_at?: string;
         };
         Relationships: [];
       };

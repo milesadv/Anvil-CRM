@@ -7,7 +7,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "anvil crm",
-  description: "client management for anvil.",
+  description: "client management for anvil",
 };
 
 export const viewport: Viewport = {

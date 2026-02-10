@@ -22,6 +22,7 @@ function mapContact(row: Record<string, unknown>): Contact {
     company: row.company as string,
     role: row.role as string,
     phone: row.phone as string,
+    website: (row.website as string) ?? "",
     status: row.status as Contact["status"],
     lastContact: row.last_contact as string,
     avatar: row.avatar as string,
@@ -102,26 +103,45 @@ export function CrmShell() {
       <CrmNav activeView={activeView} onNavigate={setActiveView} />
       <main className="mx-auto max-w-6xl">
         {loading ? (
-          <div className="px-4 pt-6 sm:px-6 sm:pt-8">
-            <Skeleton className="h-6 w-28" />
-            <div className="mt-6 grid grid-cols-2 gap-6 md:grid-cols-4">
+          <div
+            className="px-4 pt-6 sm:px-6 sm:pt-8"
+            style={{ animation: "viewFadeIn 0.4s ease-out" }}
+          >
+            <Skeleton className="h-6 w-28 rounded-lg" />
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i}>
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="mt-3 h-8 w-32" />
+                <div
+                  key={i}
+                  className="rounded-xl border border-border/40 bg-card/30 px-4 py-4 sm:px-5 sm:py-5"
+                >
+                  <Skeleton className="h-3 w-20 rounded" />
+                  <Skeleton className="mt-3 h-8 w-28 rounded-lg" />
                 </div>
               ))}
             </div>
-            <div className="mt-8 space-y-4">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-5 w-full" />
+            <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-border/40 bg-card/30 p-5 sm:p-6"
+                >
+                  <Skeleton className="h-4 w-32 rounded" />
+                  <div className="mt-5 space-y-3">
+                    {Array.from({ length: 4 }).map((_, j) => (
+                      <Skeleton key={j} className="h-5 w-full rounded" />
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
         ) : (
           <>
             {activeView === "overview" && (
-              <>
+              <div
+                key="overview"
+                style={{ animation: "viewFadeIn 0.35s ease-out" }}
+              >
                 <PageHeader title="Overview" />
                 <div className="flex flex-col px-4 pb-8 sm:px-6">
                   <StatCards contacts={contacts} deals={deals} />
@@ -139,10 +159,13 @@ export function CrmShell() {
                     />
                   </div>
                 </div>
-              </>
+              </div>
             )}
             {activeView === "contacts" && (
-              <>
+              <div
+                key="contacts"
+                style={{ animation: "viewFadeIn 0.35s ease-out" }}
+              >
                 <PageHeader
                   title="Contacts"
                   description="Manage your leads, prospects and customers"
@@ -153,10 +176,13 @@ export function CrmShell() {
                   activities={activities}
                   onContactAdded={refreshAll}
                 />
-              </>
+              </div>
             )}
             {activeView === "pipeline" && (
-              <>
+              <div
+                key="pipeline"
+                style={{ animation: "viewFadeIn 0.35s ease-out" }}
+              >
                 <PageHeader
                   title="Pipeline"
                   description="Track deals through your sales process"
@@ -166,10 +192,13 @@ export function CrmShell() {
                   contacts={contacts}
                   onDealAdded={refreshAll}
                 />
-              </>
+              </div>
             )}
             {activeView === "activity" && (
-              <>
+              <div
+                key="activity"
+                style={{ animation: "viewFadeIn 0.35s ease-out" }}
+              >
                 <PageHeader
                   title="Activity"
                   description="Track calls, emails, meetings and tasks"
@@ -179,7 +208,7 @@ export function CrmShell() {
                   contacts={contacts}
                   onActivityAdded={refreshAll}
                 />
-              </>
+              </div>
             )}
           </>
         )}

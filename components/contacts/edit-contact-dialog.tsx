@@ -40,6 +40,7 @@ export function EditContactDialog({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
+  const [website, setWebsite] = useState("");
   const [role, setRole] = useState("");
   const [status, setStatus] = useState<
     "lead" | "prospect" | "customer" | "churned"
@@ -55,6 +56,7 @@ export function EditContactDialog({
       setEmail(contact.email);
       setPhone(contact.phone);
       setCompany(contact.company);
+      setWebsite(contact.website || "");
       setRole(contact.role);
       setStatus(contact.status);
       setNotes(contact.notes || "");
@@ -77,6 +79,7 @@ export function EditContactDialog({
         email,
         phone,
         company,
+        website,
         role,
         status,
         avatar,
@@ -168,6 +171,21 @@ export function EditContactDialog({
               id="editCompany"
               value={company}
               onChange={(e) => setCompany(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label
+              htmlFor="editWebsite"
+              className="text-xs text-muted-foreground"
+            >
+              Website
+            </Label>
+            <Input
+              id="editWebsite"
+              type="url"
+              placeholder="https://example.co.uk"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
             />
           </div>
           <div className="flex flex-col gap-1.5">

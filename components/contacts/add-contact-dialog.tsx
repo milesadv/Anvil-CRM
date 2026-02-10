@@ -37,6 +37,7 @@ export function AddContactDialog({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
+  const [website, setWebsite] = useState("");
   const [role, setRole] = useState("");
   const [status, setStatus] = useState<
     "lead" | "prospect" | "customer" | "churned"
@@ -50,6 +51,7 @@ export function AddContactDialog({
     setEmail("");
     setPhone("");
     setCompany("");
+    setWebsite("");
     setRole("");
     setStatus("lead");
     setNotes("");
@@ -74,6 +76,7 @@ export function AddContactDialog({
       email,
       phone,
       company,
+      website,
       role,
       status,
       avatar,
@@ -161,6 +164,18 @@ export function AddContactDialog({
               placeholder="Acme Ltd"
               value={company}
               onChange={(e) => setCompany(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="website" className="text-xs text-muted-foreground">
+              Website
+            </Label>
+            <Input
+              id="website"
+              type="url"
+              placeholder="https://example.co.uk"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
             />
           </div>
           <div className="flex flex-col gap-1.5">
