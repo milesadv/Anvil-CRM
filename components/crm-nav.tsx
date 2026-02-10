@@ -18,11 +18,11 @@ interface CrmNavProps {
 
 export function CrmNav({ activeView, onNavigate }: CrmNavProps) {
   return (
-    <div className="sticky top-0 z-40 flex flex-col items-center px-6 pt-5 pb-2">
-      <span className="mb-3 text-sm font-semibold tracking-[0.2em] text-white/90">
+    <div className="sticky top-0 z-40 flex flex-col items-center px-4 pt-4 pb-2 sm:px-6 sm:pt-5">
+      <span className="mb-2.5 text-sm font-semibold tracking-[0.2em] text-white/90 sm:mb-3">
         anvil.
       </span>
-      <nav className="flex items-center gap-0.5 rounded-md border border-white/[0.08] bg-white/[0.04] p-1 backdrop-blur-2xl">
+      <nav className="flex w-full items-center justify-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.04] p-1.5 backdrop-blur-2xl sm:w-auto">
         {navItems.map((item) => {
           const isActive = activeView === item.id
           return (
@@ -31,7 +31,7 @@ export function CrmNav({ activeView, onNavigate }: CrmNavProps) {
               type="button"
               onClick={() => onNavigate(item.id)}
               className={cn(
-                "relative rounded-sm px-5 py-2 text-xs font-medium tracking-wide transition-all duration-150",
+                "relative flex-1 rounded-md px-3 py-2 text-xs font-medium tracking-wide transition-all duration-150 sm:flex-none sm:px-5",
                 isActive
                   ? "bg-white text-[#0a0a0a] shadow-[0_1px_2px_rgba(0,0,0,0.4)]"
                   : "text-white/50 hover:text-white/80 hover:bg-white/[0.06]"

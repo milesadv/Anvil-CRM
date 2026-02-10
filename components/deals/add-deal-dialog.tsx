@@ -33,7 +33,7 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
   const [amount, setAmount] = useState("")
   const [probability, setProbability] = useState("50")
   const [contactId, setContactId] = useState("")
-  const [stage, setStage] = useState<"prospecting" | "qualification" | "proposal" | "negotiation" | "closed_won" | "closed_lost">("prospecting")
+  const [stage, setStage] = useState<"discovery" | "pricing" | "negotiating" | "closing">("discovery")
   const [expectedCloseDate, setExpectedCloseDate] = useState("")
   const [saving, setSaving] = useState(false)
 
@@ -42,7 +42,7 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
     setAmount("")
     setProbability("50")
     setContactId("")
-    setStage("prospecting")
+    setStage("discovery")
     setExpectedCloseDate("")
   }
 
@@ -139,10 +139,10 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="prospecting">Prospecting</SelectItem>
-                <SelectItem value="qualification">Qualification</SelectItem>
-                <SelectItem value="proposal">Proposal</SelectItem>
-                <SelectItem value="negotiation">Negotiation</SelectItem>
+                <SelectItem value="discovery">Discovery</SelectItem>
+                <SelectItem value="pricing">Pricing</SelectItem>
+                <SelectItem value="negotiating">Negotiating</SelectItem>
+                <SelectItem value="closing">Closing</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -3,7 +3,7 @@
 import { formatCurrency, stageLabels } from "@/lib/crm-data"
 import type { Deal, DealStage } from "@/lib/crm-data"
 
-const stages: DealStage[] = ["prospecting", "qualification", "proposal", "negotiation", "closed_won", "closed_lost"]
+const stages: DealStage[] = ["discovery", "pricing", "negotiating", "closing"]
 
 interface PipelineChartProps {
   deals: Deal[]
@@ -28,8 +28,8 @@ export function PipelineChart({ deals }: PipelineChartProps) {
           {stageData.map((stage) => {
             const widthPercent = maxTotal > 0 ? Math.max((stage.total / maxTotal) * 100, 4) : 4
             return (
-              <div key={stage.key} className="flex items-center gap-4">
-                <span className="w-28 flex-shrink-0 text-sm text-muted-foreground">
+              <div key={stage.key} className="flex items-center gap-3 sm:gap-4">
+                <span className="w-20 flex-shrink-0 text-sm text-muted-foreground sm:w-28">
                   {stage.label}
                 </span>
                 <div className="relative flex-1">
@@ -40,11 +40,11 @@ export function PipelineChart({ deals }: PipelineChartProps) {
                     />
                   </div>
                 </div>
-                <div className="flex w-28 flex-shrink-0 items-center justify-end gap-4">
+                <div className="flex w-20 flex-shrink-0 items-center justify-end gap-3 sm:w-28 sm:gap-4">
                   <span className="text-base tabular-nums text-foreground">
                     {formatCurrency(stage.total)}
                   </span>
-                  <span className="text-sm tabular-nums text-muted-foreground">
+                  <span className="hidden text-sm tabular-nums text-muted-foreground sm:inline">
                     {stage.count}
                   </span>
                 </div>

@@ -1,8 +1,7 @@
 // CRM Types
 export type ContactStatus = "lead" | "prospect" | "customer" | "churned"
-export type DealStage = "prospecting" | "qualification" | "proposal" | "negotiation" | "closed_won" | "closed_lost"
+export type DealStage = "discovery" | "pricing" | "negotiating" | "closing"
 export type ActivityType = "call" | "email" | "meeting" | "note" | "task"
-export type Priority = "low" | "medium" | "high"
 
 export interface Contact {
   id: string
@@ -76,10 +75,8 @@ export function getContactName(contactId: string, contacts: Contact[]): string {
 }
 
 export const stageLabels: Record<DealStage, string> = {
-  prospecting: "Prospecting",
-  qualification: "Qualification",
-  proposal: "Proposal",
-  negotiation: "Negotiation",
-  closed_won: "Closed Won",
-  closed_lost: "Closed Lost",
+  discovery: "Discovery",
+  pricing: "Pricing",
+  negotiating: "Negotiating",
+  closing: "Closing",
 }

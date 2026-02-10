@@ -2,12 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
 @layer base {
   :root {
     --background: 0 0% 4%;
@@ -29,33 +23,24 @@
     --border: 0 0% 15%;
     --input: 0 0% 15%;
     --ring: 0 0% 30%;
-    --chart-1: 0 0% 60%;
-    --chart-2: 160 50% 40%;
-    --chart-3: 220 60% 55%;
-    --chart-4: 45 80% 55%;
-    --chart-5: 340 65% 50%;
     --radius: 0.5rem;
     --success: 152 60% 42%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
-    --sidebar-background: 0 0% 3%;
-    --sidebar-foreground: 0 0% 45%;
-    --sidebar-primary: 0 0% 98%;
-    --sidebar-primary-foreground: 0 0% 4%;
-    --sidebar-accent: 0 0% 9%;
-    --sidebar-accent-foreground: 0 0% 85%;
-    --sidebar-border: 0 0% 10%;
-    --sidebar-ring: 0 0% 30%;
-    --sidebar-muted: 0 0% 30%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+    scrollbar-width: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
   }
   body {
     @apply bg-background text-foreground antialiased;
+    -webkit-overflow-scrolling: touch;
   }
 }

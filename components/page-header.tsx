@@ -12,7 +12,7 @@ export function PageHeader({ title, description, children, className }: PageHead
   return (
     <div
       className={cn(
-        "flex items-end justify-between px-6 pb-8 pt-10",
+        "flex items-end justify-between px-4 pb-6 pt-6 sm:px-6 sm:pb-8 sm:pt-10",
         className
       )}
     >

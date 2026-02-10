@@ -46,7 +46,7 @@ export type Database = {
           contact_id: string
           title: string
           amount: number
-          stage: "prospecting" | "qualification" | "proposal" | "negotiation" | "closed_won" | "closed_lost"
+          stage: "discovery" | "pricing" | "negotiating" | "closing"
           probability: number
           expected_close_date: string | null
           created_at: string
@@ -56,7 +56,7 @@ export type Database = {
           contact_id: string
           title: string
           amount?: number
-          stage?: "prospecting" | "qualification" | "proposal" | "negotiation" | "closed_won" | "closed_lost"
+          stage?: "discovery" | "pricing" | "negotiating" | "closing"
           probability?: number
           expected_close_date?: string | null
           created_at?: string
@@ -66,7 +66,7 @@ export type Database = {
           contact_id?: string
           title?: string
           amount?: number
-          stage?: "prospecting" | "qualification" | "proposal" | "negotiation" | "closed_won" | "closed_lost"
+          stage?: "discovery" | "pricing" | "negotiating" | "closing"
           probability?: number
           expected_close_date?: string | null
           created_at?: string

@@ -101,7 +101,7 @@ export function CrmShell() {
       <CrmNav activeView={activeView} onNavigate={setActiveView} />
       <main className="mx-auto max-w-6xl">
         {loading ? (
-          <div className="px-6 pt-8">
+          <div className="px-4 pt-6 sm:px-6 sm:pt-8">
             <Skeleton className="h-6 w-28" />
             <div className="mt-6 grid grid-cols-2 gap-6 md:grid-cols-4">
               {Array.from({ length: 4 }).map((_, i) => (
@@ -122,13 +122,13 @@ export function CrmShell() {
             {activeView === "overview" && (
               <>
                 <PageHeader title="Overview" />
-                <div className="flex flex-col px-6 pb-8">
+                <div className="flex flex-col px-4 pb-8 sm:px-6">
                   <StatCards contacts={contacts} deals={deals} />
-                  <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-2">
+                  <div className="mt-8 grid grid-cols-1 gap-8 sm:mt-10 sm:gap-10 lg:grid-cols-2">
                     <PipelineChart deals={deals} />
                     <RecentActivity activities={activities} contacts={contacts} />
                   </div>
-                  <div className="mt-10">
+                  <div className="mt-8 sm:mt-10">
                     <UpcomingTasks activities={activities} contacts={contacts} />
                   </div>
                 </div>

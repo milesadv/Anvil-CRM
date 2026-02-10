@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { AddDealDialog } from "./add-deal-dialog"
 
-const stageOrder: DealStage[] = ["prospecting", "qualification", "proposal", "negotiation", "closed_won", "closed_lost"]
+const stageOrder: DealStage[] = ["discovery", "pricing", "negotiating", "closing"]
 
 function DealCard({ deal, contacts }: { deal: Deal; contacts: Contact[] }) {
   return (
@@ -39,11 +39,11 @@ interface PipelineBoardProps {
 export function PipelineBoard({ deals, contacts, onDealAdded }: PipelineBoardProps) {
   const [addOpen, setAddOpen] = useState(false)
 
-  const activeDeals = deals.filter((d) => d.stage !== "closed_won" && d.stage !== "closed_lost")
+  const activeDeals = deals
 
   return (
     <>
-      <div className="flex items-center justify-between px-6 pb-4">
+      <div className="flex items-center justify-between px-4 pb-4 sm:px-6">
         <span className="text-sm tabular-nums text-muted-foreground">
           {activeDeals.length} active deals
         </span>
@@ -56,13 +56,13 @@ export function PipelineBoard({ deals, contacts, onDealAdded }: PipelineBoardPro
         </Button>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto px-6 pb-8">
+      <div className="flex gap-3 overflow-x-auto px-4 pb-8 sm:gap-4 sm:px-6">
         {stageOrder.map((stageKey) => {
           const stageDeals = deals.filter((d) => d.stage === stageKey)
           const stageTotal = stageDeals.reduce((sum, d) => sum + d.amount, 0)
 
           return (
-            <div key={stageKey} className="flex w-60 flex-shrink-0 flex-col">
+            <div key={stageKey} className="flex w-52 flex-shrink-0 flex-col sm:w-60">
               <div className="mb-2 flex items-baseline justify-between px-3">
                 <div className="flex items-baseline gap-2">
                   <span className="text-sm text-muted-foreground">

@@ -27,8 +27,8 @@ create table if not exists public.deals (
   contact_id uuid references public.contacts(id) on delete cascade,
   title text not null,
   amount decimal not null default 0,
-  stage text not null default 'prospecting'
-    check (stage in ('prospecting', 'qualification', 'proposal', 'negotiation', 'closed_won', 'closed_lost')),
+  stage text not null default 'discovery'
+    check (stage in ('discovery', 'pricing', 'negotiating', 'closing')),
   probability integer not null default 0
     check (probability >= 0 and probability <= 100),
   expected_close_date date,

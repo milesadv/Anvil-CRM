@@ -28,7 +28,7 @@ export function ContactDetail({ contact, open, onClose, onEdit, deals, activitie
     <Sheet open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
       <SheetContent
         side="right"
-        className="w-[400px] overflow-y-auto border-border bg-background p-0 sm:max-w-[400px]"
+        className="w-full overflow-y-auto border-border bg-background p-0 sm:w-[400px] sm:max-w-[400px]"
       >
         {contact && (
           <>

@@ -42,15 +42,15 @@ export function ActivityList({ activities, contacts, onActivityAdded }: Activity
   return (
     <>
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-4 px-6 pb-4">
-        <div className="flex items-center gap-1">
+      <div className="flex flex-col gap-3 px-4 pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6">
+        <div className="flex items-center gap-1 overflow-x-auto">
           {typeFilters.map((filter) => (
             <button
               key={filter.value}
               type="button"
               onClick={() => setTypeFilter(filter.value)}
               className={cn(
-                "rounded-md px-2.5 py-1.5 text-sm transition-colors",
+                "whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm transition-colors",
                 typeFilter === filter.value
                   ? "bg-secondary text-foreground"
                   : "text-muted-foreground hover:text-foreground"
@@ -65,11 +65,11 @@ export function ActivityList({ activities, contacts, onActivityAdded }: Activity
             placeholder="Search activities..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-8 w-52 text-sm"
+            className="h-8 min-w-0 flex-1 text-sm sm:w-52 sm:flex-none"
           />
           <Button
             size="sm"
-            className="h-7 rounded-md bg-foreground px-3 text-sm font-normal text-background hover:bg-foreground/90"
+            className="h-7 shrink-0 rounded-md bg-foreground px-3 text-sm font-normal text-background hover:bg-foreground/90"
             onClick={() => setAddOpen(true)}
           >
             Log activity
@@ -78,7 +78,7 @@ export function ActivityList({ activities, contacts, onActivityAdded }: Activity
       </div>
 
       {/* List */}
-      <div className="px-6 pb-8">
+      <div className="px-4 pb-8 sm:px-6">
         {activities.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <p className="text-sm text-muted-foreground">No activity yet</p>
