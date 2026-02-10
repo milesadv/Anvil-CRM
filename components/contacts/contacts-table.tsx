@@ -48,16 +48,16 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
     <>
       {/* Toolbar */}
       <div className="flex flex-col gap-3 px-4 pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6">
-        <div className="flex items-center gap-1 overflow-x-auto">
+        <div className="flex items-center gap-0.5 overflow-x-auto rounded-lg border border-border/40 bg-card/30 p-0.5">
           {statusFilters.map((filter) => (
             <button
               key={filter.value}
               type="button"
               onClick={() => setStatusFilter(filter.value)}
               className={cn(
-                "whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm transition-colors",
+                "whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs transition-all duration-150",
                 statusFilter === filter.value
-                  ? "bg-secondary text-foreground"
+                  ? "bg-secondary text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -65,7 +65,7 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <Input
             placeholder="Search contacts..."
             value={search}
@@ -74,7 +74,7 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
           />
           <Button
             size="sm"
-            className="h-7 shrink-0 rounded-md bg-foreground px-3 text-sm font-normal text-background hover:bg-foreground/90"
+            className="h-7 shrink-0 rounded-lg bg-foreground px-3.5 text-xs font-medium text-background shadow-[0_1px_2px_rgba(0,0,0,0.2)] hover:bg-foreground/90"
             onClick={() => setAddOpen(true)}
           >
             New contact
@@ -85,9 +85,9 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
       {/* Table */}
       <div className="overflow-x-auto px-4 pb-8 sm:px-6">
         {contacts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/30 py-20">
             <p className="text-sm text-muted-foreground">No contacts yet</p>
-            <p className="mt-1 text-sm text-muted-foreground/50">
+            <p className="mt-1.5 text-xs text-muted-foreground/40">
               Add your first contact to get started
             </p>
           </div>
@@ -97,7 +97,7 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
               <TableHeader>
                 <TableRow>
                   {["Name", "Company", "Status", "Last contact"].map((header) => (
-                    <TableHead key={header}>{header}</TableHead>
+                    <TableHead key={header} className="text-2xs font-medium uppercase tracking-wider text-muted-foreground/50">{header}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
@@ -106,24 +106,24 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
                   <TableRow
                     key={contact.id}
                     onClick={() => setSelectedContact(contact)}
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-colors hover:bg-card/50"
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-7 w-7">
-                          <AvatarFallback className="bg-secondary text-2xs font-medium text-muted-foreground">
+                          <AvatarFallback className="bg-secondary/80 text-2xs font-medium text-muted-foreground">
                             {contact.avatar}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="text-base text-foreground">{contact.name}</p>
-                          <p className="text-xs text-muted-foreground">{contact.email}</p>
+                          <p className="text-sm text-foreground">{contact.name}</p>
+                          <p className="text-2xs text-muted-foreground/60">{contact.email}</p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <p className="text-base text-foreground">{contact.company}</p>
-                      <p className="text-xs text-muted-foreground">{contact.role}</p>
+                      <p className="text-sm text-foreground">{contact.company}</p>
+                      <p className="text-2xs text-muted-foreground/60">{contact.role}</p>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -131,18 +131,18 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
                           className={cn(
                             "h-1.5 w-1.5 rounded-full",
                             contact.status === "customer" && "bg-success",
-                            contact.status === "prospect" && "bg-foreground/40",
-                            contact.status === "lead" && "bg-primary",
-                            contact.status === "churned" && "bg-destructive"
+                            contact.status === "prospect" && "bg-foreground/35",
+                            contact.status === "lead" && "bg-foreground",
+                            contact.status === "churned" && "bg-destructive/70"
                           )}
                         />
-                        <span className="text-sm capitalize text-muted-foreground">
+                        <span className="text-xs capitalize text-muted-foreground">
                           {contact.status}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm tabular-nums text-muted-foreground">
+                      <span className="text-xs tabular-nums text-muted-foreground/60">
                         {getRelativeDate(contact.lastContact)}
                       </span>
                     </TableCell>
@@ -152,7 +152,7 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
             </Table>
             {filtered.length === 0 && (
               <div className="flex items-center justify-center py-16">
-                <p className="text-base text-muted-foreground">No contacts found</p>
+                <p className="text-sm text-muted-foreground/50">No contacts found</p>
               </div>
             )}
           </>

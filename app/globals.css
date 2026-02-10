@@ -15,13 +15,13 @@
     --secondary: 0 0% 11%;
     --secondary-foreground: 0 0% 75%;
     --muted: 0 0% 13%;
-    --muted-foreground: 0 0% 55%;
+    --muted-foreground: 0 0% 50%;
     --accent: 0 0% 14%;
     --accent-foreground: 0 0% 85%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
     --ring: 0 0% 30%;
     --radius: 0.5rem;
     --success: 152 60% 42%;
@@ -42,5 +42,8 @@
   body {
     @apply bg-background text-foreground antialiased;
     -webkit-overflow-scrolling: touch;
+  }
+  ::selection {
+    background: hsl(0 0% 98% / 0.15);
   }
 }
