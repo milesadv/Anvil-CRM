@@ -1,0 +1,58 @@
+"use client"
+
+import { formatCurrency, stageLabels } from "@/lib/crm-data"
+import type { Deal, DealStage } from "@/lib/crm-data"
+
+const stages: DealStage[] = ["discovery-call", "pricing", "negotiation", "closed"]
+
+interface PipelineChartProps {
+  deals: Deal[]
+}
+
+export function PipelineChart({ deals }: PipelineChartProps) {
+  const stageData = stages.map((key) => {
+    const stageDeals = deals.filter((d) => d.stage === key)
+    const total = stageDeals.reduce((sum, d) => sum + d.value, 0)
+    return { key, label: stageLabels[key], count: stageDeals.length, total }
+  })
+
+  const maxTotal = Math.max(...stageData.map((s) => s.total), 1)
+
+  return (
+    <div>
+      <p className="text-[12px] text-muted-foreground">Pipeline breakdown</p>
+      {deals.length === 0 ? (
+        <p className="mt-6 text-[13px] text-muted-foreground/50">No deals in the pipeline yet</p>
+      ) : (
+        <div className="mt-4 flex flex-col gap-3">
+          {stageData.map((stage) => {
+            const widthPercent = maxTotal > 0 ? Math.max((stage.total / maxTotal) * 100, 4) : 4
+            return (
+              <div key={stage.key} className="flex items-center gap-4">
+                <span className="w-28 flex-shrink-0 text-[12px] text-muted-foreground">
+                  {stage.label}
+                </span>
+                <div className="relative flex-1">
+                  <div className="h-5 w-full overflow-hidden bg-secondary">
+                    <div
+                      className="h-full bg-foreground/20 transition-all duration-700"
+                      style={{ width: `${widthPercent}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="flex w-28 flex-shrink-0 items-center justify-end gap-4">
+                  <span className="text-[13px] tabular-nums text-foreground">
+                    {formatCurrency(stage.total)}
+                  </span>
+                  <span className="text-[12px] tabular-nums text-muted-foreground">
+                    {stage.count}
+                  </span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
