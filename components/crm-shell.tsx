@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useCallback } from "react"
-import { CrmNav, type CrmView } from "./crm-sidebar"
+import { CrmNav, type CrmView } from "./crm-nav"
 import { PageHeader } from "./page-header"
 import { StatCards } from "./dashboard/stat-cards"
 import { PipelineChart } from "./dashboard/pipeline-chart"
@@ -10,6 +10,7 @@ import { UpcomingTasks } from "./dashboard/upcoming-tasks"
 import { ContactsTable } from "./contacts/contacts-table"
 import { PipelineBoard } from "./deals/pipeline-board"
 import { ActivityList } from "./activities/activity-list"
+import { Skeleton } from "@/components/ui/skeleton"
 import { supabase } from "@/lib/supabase"
 import type { Contact, Deal, Activity } from "@/lib/crm-data"
 
@@ -24,6 +25,7 @@ function mapContact(row: Record<string, unknown>): Contact {
     status: row.status as Contact["status"],
     lastContact: row.last_contact as string,
     avatar: row.avatar as string,
+    notes: (row.notes as string) ?? "",
   }
 }
 
@@ -59,6 +61,7 @@ export function CrmShell() {
   const [contacts, setContacts] = useState<Contact[]>([])
   const [deals, setDeals] = useState<Deal[]>([])
   const [activities, setActivities] = useState<Activity[]>([])
+  const [loading, setLoading] = useState(true)
 
   const fetchContacts = useCallback(async () => {
     const { data } = await supabase
@@ -86,6 +89,7 @@ export function CrmShell() {
 
   const refreshAll = useCallback(async () => {
     await Promise.all([fetchContacts(), fetchDeals(), fetchActivities()])
+    setLoading(false)
   }, [fetchContacts, fetchDeals, fetchActivities])
 
   useEffect(() => {
@@ -96,42 +100,63 @@ export function CrmShell() {
     <div className="min-h-screen bg-background">
       <CrmNav activeView={activeView} onNavigate={setActiveView} />
       <main className="mx-auto max-w-6xl">
-        {activeView === "overview" && (
-          <>
-            <PageHeader title="Overview" />
-            <div className="flex flex-col gap-px px-6 pb-8">
-              <StatCards contacts={contacts} deals={deals} />
-              <div className="mt-6 grid grid-cols-2 gap-6">
-                <PipelineChart deals={deals} />
-                <RecentActivity activities={activities} contacts={contacts} />
-              </div>
-              <div className="mt-6">
-                <UpcomingTasks activities={activities} contacts={contacts} />
-              </div>
+        {loading ? (
+          <div className="px-6 pt-8">
+            <Skeleton className="h-6 w-28" />
+            <div className="mt-6 grid grid-cols-2 gap-6 md:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i}>
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="mt-3 h-8 w-32" />
+                </div>
+              ))}
             </div>
-          </>
-        )}
-        {activeView === "contacts" && (
+            <div className="mt-8 space-y-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-5 w-full" />
+              ))}
+            </div>
+          </div>
+        ) : (
           <>
-            <PageHeader title="Contacts" description="Manage your leads, prospects and customers" />
-            <ContactsTable
-              contacts={contacts}
-              deals={deals}
-              activities={activities}
-              onContactAdded={refreshAll}
-            />
-          </>
-        )}
-        {activeView === "pipeline" && (
-          <>
-            <PageHeader title="Pipeline" description="Track deals through your sales process" />
-            <PipelineBoard deals={deals} contacts={contacts} onDealAdded={refreshAll} />
-          </>
-        )}
-        {activeView === "activity" && (
-          <>
-            <PageHeader title="Activity" description="Track calls, emails, meetings and tasks" />
-            <ActivityList activities={activities} contacts={contacts} onActivityAdded={refreshAll} />
+            {activeView === "overview" && (
+              <>
+                <PageHeader title="Overview" />
+                <div className="flex flex-col gap-px px-6 pb-8">
+                  <StatCards contacts={contacts} deals={deals} />
+                  <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <PipelineChart deals={deals} />
+                    <RecentActivity activities={activities} contacts={contacts} />
+                  </div>
+                  <div className="mt-6">
+                    <UpcomingTasks activities={activities} contacts={contacts} />
+                  </div>
+                </div>
+              </>
+            )}
+            {activeView === "contacts" && (
+              <>
+                <PageHeader title="Contacts" description="Manage your leads, prospects and customers" />
+                <ContactsTable
+                  contacts={contacts}
+                  deals={deals}
+                  activities={activities}
+                  onContactAdded={refreshAll}
+                />
+              </>
+            )}
+            {activeView === "pipeline" && (
+              <>
+                <PageHeader title="Pipeline" description="Track deals through your sales process" />
+                <PipelineBoard deals={deals} contacts={contacts} onDealAdded={refreshAll} />
+              </>
+            )}
+            {activeView === "activity" && (
+              <>
+                <PageHeader title="Activity" description="Track calls, emails, meetings and tasks" />
+                <ActivityList activities={activities} contacts={contacts} onActivityAdded={refreshAll} />
+              </>
+            )}
           </>
         )}
       </main>

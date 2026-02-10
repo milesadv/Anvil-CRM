@@ -15,13 +15,13 @@ export function UpcomingTasks({ activities, contacts }: UpcomingTasksProps) {
   return (
     <div>
       <div className="flex items-baseline justify-between">
-        <p className="text-[12px] text-muted-foreground">Upcoming</p>
-        <p className="text-[11px] tabular-nums text-muted-foreground">
+        <p className="text-sm text-muted-foreground">Upcoming</p>
+        <p className="text-xs tabular-nums text-muted-foreground">
           {upcoming.length} pending
         </p>
       </div>
       {upcoming.length === 0 ? (
-        <p className="mt-6 text-[13px] text-muted-foreground/50">No upcoming tasks</p>
+        <p className="mt-6 text-base text-muted-foreground/50">No upcoming tasks</p>
       ) : (
         <div className="mt-4 flex flex-col gap-1">
           {upcoming.map((task) => {
@@ -49,14 +49,14 @@ export function UpcomingTasks({ activities, contacts }: UpcomingTasksProps) {
                   )}
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="text-[13px] text-foreground">{task.title}</p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  <p className="text-base text-foreground">{task.title}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     {getContactName(task.contactId, contacts)}
                   </p>
                 </div>
                 <span
                   className={cn(
-                    "flex-shrink-0 text-[12px] tabular-nums",
+                    "flex-shrink-0 text-sm tabular-nums",
                     isToday ? "text-primary" : "text-muted-foreground"
                   )}
                 >

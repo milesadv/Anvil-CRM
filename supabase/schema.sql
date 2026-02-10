@@ -15,6 +15,7 @@ create table if not exists public.contacts (
     check (status in ('lead', 'prospect', 'customer', 'churned')),
   last_contact date not null default current_date,
   avatar text not null default '',
+  notes text not null default '',
   created_at timestamptz not null default now()
 );
 

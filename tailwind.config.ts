@@ -13,6 +13,15 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-inter)'],
       },
+      fontSize: {
+        '2xs': ['10px', { lineHeight: '1' }],
+        xs: ['11px', { lineHeight: '1.4' }],
+        sm: ['12px', { lineHeight: '1.5' }],
+        base: ['13px', { lineHeight: '1.5' }],
+        lg: ['15px', { lineHeight: '1.4' }],
+        xl: ['20px', { lineHeight: '1.2' }],
+        '3xl': ['32px', { lineHeight: '1' }],
+      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

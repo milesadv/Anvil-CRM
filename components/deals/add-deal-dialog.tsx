@@ -71,11 +71,11 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="border-border bg-card sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle className="text-[15px] font-medium text-foreground">New deal</DialogTitle>
+          <DialogTitle className="text-lg font-medium text-foreground">New deal</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-3">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="dealTitle" className="text-[11px] text-muted-foreground">
+            <Label htmlFor="dealTitle" className="text-xs text-muted-foreground">
               Title
             </Label>
             <Input
@@ -83,12 +83,11 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
               placeholder="Enterprise licence"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="h-9 border-border bg-secondary text-[13px] text-foreground placeholder:text-muted-foreground"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="dealAmount" className="text-[11px] text-muted-foreground">
+              <Label htmlFor="dealAmount" className="text-xs text-muted-foreground">
                 {"Amount (\u00A3)"}
               </Label>
               <Input
@@ -97,11 +96,10 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
                 placeholder="50000"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="h-9 border-border bg-secondary text-[13px] text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="probability" className="text-[11px] text-muted-foreground">
+              <Label htmlFor="probability" className="text-xs text-muted-foreground">
                 Probability (%)
               </Label>
               <Input
@@ -110,17 +108,16 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
                 placeholder="50"
                 value={probability}
                 onChange={(e) => setProbability(e.target.value)}
-                className="h-9 border-border bg-secondary text-[13px] text-foreground placeholder:text-muted-foreground"
               />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label className="text-[11px] text-muted-foreground">Contact</Label>
+            <Label className="text-xs text-muted-foreground">Contact</Label>
             <Select value={contactId} onValueChange={setContactId}>
-              <SelectTrigger className="h-9 border-border bg-secondary text-[13px] text-foreground">
+              <SelectTrigger>
                 <SelectValue placeholder="Select contact" />
               </SelectTrigger>
-              <SelectContent className="border-border bg-card text-foreground">
+              <SelectContent>
                 {contacts.length > 0 ? (
                   contacts.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
@@ -136,12 +133,12 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
             </Select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label className="text-[11px] text-muted-foreground">Stage</Label>
+            <Label className="text-xs text-muted-foreground">Stage</Label>
             <Select value={stage} onValueChange={(v) => setStage(v as typeof stage)}>
-              <SelectTrigger className="h-9 border-border bg-secondary text-[13px] text-foreground">
+              <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="border-border bg-card text-foreground">
+              <SelectContent>
                 <SelectItem value="prospecting">Prospecting</SelectItem>
                 <SelectItem value="qualification">Qualification</SelectItem>
                 <SelectItem value="proposal">Proposal</SelectItem>
@@ -150,7 +147,7 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
             </Select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="expectedCloseDate" className="text-[11px] text-muted-foreground">
+            <Label htmlFor="expectedCloseDate" className="text-xs text-muted-foreground">
               Expected close
             </Label>
             <Input
@@ -158,7 +155,6 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
               type="date"
               value={expectedCloseDate}
               onChange={(e) => setExpectedCloseDate(e.target.value)}
-              className="h-9 border-border bg-secondary text-[13px] text-foreground"
             />
           </div>
         </div>
@@ -167,7 +163,7 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
             variant="outline"
             size="sm"
             onClick={() => onOpenChange(false)}
-            className="border-border bg-transparent text-[12px] text-muted-foreground hover:bg-secondary hover:text-foreground"
+            className="border-border bg-transparent text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
           >
             Cancel
           </Button>
@@ -175,7 +171,7 @@ export function AddDealDialog({ open, onOpenChange, contacts, onDealAdded }: Add
             size="sm"
             onClick={handleSubmit}
             disabled={saving || !title || !amount || !contactId}
-            className="bg-foreground text-[12px] text-background hover:bg-foreground/90"
+            className="bg-foreground text-sm text-background hover:bg-foreground/90"
           >
             {saving ? "Creating..." : "Create deal"}
           </Button>

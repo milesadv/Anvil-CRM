@@ -14,6 +14,7 @@ export interface Contact {
   status: ContactStatus
   lastContact: string
   avatar: string
+  notes: string
 }
 
 export interface Deal {

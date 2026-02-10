@@ -20,16 +20,16 @@ export function PipelineChart({ deals }: PipelineChartProps) {
 
   return (
     <div>
-      <p className="text-[12px] text-muted-foreground">Pipeline breakdown</p>
+      <p className="text-sm text-muted-foreground">Pipeline breakdown</p>
       {deals.length === 0 ? (
-        <p className="mt-6 text-[13px] text-muted-foreground/50">No deals in the pipeline yet</p>
+        <p className="mt-6 text-base text-muted-foreground/50">No deals in the pipeline yet</p>
       ) : (
         <div className="mt-4 flex flex-col gap-3">
           {stageData.map((stage) => {
             const widthPercent = maxTotal > 0 ? Math.max((stage.total / maxTotal) * 100, 4) : 4
             return (
               <div key={stage.key} className="flex items-center gap-4">
-                <span className="w-28 flex-shrink-0 text-[12px] text-muted-foreground">
+                <span className="w-28 flex-shrink-0 text-sm text-muted-foreground">
                   {stage.label}
                 </span>
                 <div className="relative flex-1">
@@ -41,10 +41,10 @@ export function PipelineChart({ deals }: PipelineChartProps) {
                   </div>
                 </div>
                 <div className="flex w-28 flex-shrink-0 items-center justify-end gap-4">
-                  <span className="text-[13px] tabular-nums text-foreground">
+                  <span className="text-base tabular-nums text-foreground">
                     {formatCurrency(stage.total)}
                   </span>
-                  <span className="text-[12px] tabular-nums text-muted-foreground">
+                  <span className="text-sm tabular-nums text-muted-foreground">
                     {stage.count}
                   </span>
                 </div>

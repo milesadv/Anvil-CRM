@@ -26,11 +26,11 @@ export function StatCards({ contacts, deals }: StatCardsProps) {
   ]
 
   return (
-    <div className="grid grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
       {stats.map((stat) => (
         <div key={stat.label}>
-          <p className="text-[12px] text-muted-foreground">{stat.label}</p>
-          <p className="mt-2 text-[32px] font-light tabular-nums leading-none tracking-tight text-foreground">
+          <p className="text-sm text-muted-foreground">{stat.label}</p>
+          <p className="mt-2 text-3xl font-light tabular-nums leading-none tracking-tight text-foreground">
             {stat.value}
           </p>
         </div>

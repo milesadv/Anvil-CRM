@@ -69,18 +69,18 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="border-border bg-card sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle className="text-[15px] font-medium text-foreground">
+          <DialogTitle className="text-lg font-medium text-foreground">
             Log activity
           </DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-3">
           <div className="flex flex-col gap-1.5">
-            <Label className="text-[11px] text-muted-foreground">Type</Label>
+            <Label className="text-xs text-muted-foreground">Type</Label>
             <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
-              <SelectTrigger className="h-9 border-border bg-secondary text-[13px] text-foreground">
+              <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="border-border bg-card text-foreground">
+              <SelectContent>
                 <SelectItem value="call">Call</SelectItem>
                 <SelectItem value="email">Email</SelectItem>
                 <SelectItem value="meeting">Meeting</SelectItem>
@@ -90,7 +90,7 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
             </Select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="activityTitle" className="text-[11px] text-muted-foreground">
+            <Label htmlFor="activityTitle" className="text-xs text-muted-foreground">
               Title
             </Label>
             <Input
@@ -98,16 +98,15 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
               placeholder="Follow-up call"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="h-9 border-border bg-secondary text-[13px] text-foreground placeholder:text-muted-foreground"
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label className="text-[11px] text-muted-foreground">Contact</Label>
+            <Label className="text-xs text-muted-foreground">Contact</Label>
             <Select value={contactId} onValueChange={setContactId}>
-              <SelectTrigger className="h-9 border-border bg-secondary text-[13px] text-foreground">
+              <SelectTrigger>
                 <SelectValue placeholder="Select contact" />
               </SelectTrigger>
-              <SelectContent className="border-border bg-card text-foreground">
+              <SelectContent>
                 {contacts.length > 0 ? (
                   contacts.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
@@ -123,7 +122,7 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
             </Select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="activityDesc" className="text-[11px] text-muted-foreground">
+            <Label htmlFor="activityDesc" className="text-xs text-muted-foreground">
               Description
             </Label>
             <Textarea
@@ -131,11 +130,10 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
               placeholder="Add details..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="min-h-[80px] border-border bg-secondary text-[13px] text-foreground placeholder:text-muted-foreground"
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="activityDueDate" className="text-[11px] text-muted-foreground">
+            <Label htmlFor="activityDueDate" className="text-xs text-muted-foreground">
               Due date
             </Label>
             <Input
@@ -143,7 +141,6 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="h-9 border-border bg-secondary text-[13px] text-foreground"
             />
           </div>
         </div>
@@ -152,7 +149,7 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
             variant="outline"
             size="sm"
             onClick={() => onOpenChange(false)}
-            className="border-border bg-transparent text-[12px] text-muted-foreground hover:bg-secondary hover:text-foreground"
+            className="border-border bg-transparent text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
           >
             Cancel
           </Button>
@@ -160,7 +157,7 @@ export function AddActivityDialog({ open, onOpenChange, contacts, onActivityAdde
             size="sm"
             onClick={handleSubmit}
             disabled={saving || !title || !contactId}
-            className="bg-foreground text-[12px] text-background hover:bg-foreground/90"
+            className="bg-foreground text-sm text-background hover:bg-foreground/90"
           >
             {saving ? "Logging..." : "Log activity"}
           </Button>

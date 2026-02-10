@@ -12,16 +12,16 @@ const stageOrder: DealStage[] = ["prospecting", "qualification", "proposal", "ne
 function DealCard({ deal, contacts }: { deal: Deal; contacts: Contact[] }) {
   return (
     <div className="group border-b border-border px-3 py-3 transition-colors last:border-0 hover:bg-secondary/50">
-      <p className="text-[13px] text-foreground">{deal.title}</p>
-      <p className="mt-0.5 text-[11px] text-muted-foreground">
+      <p className="text-base text-foreground">{deal.title}</p>
+      <p className="mt-0.5 text-xs text-muted-foreground">
         {getContactName(deal.contactId, contacts)}
       </p>
       <div className="mt-2.5 flex items-center justify-between">
-        <span className="text-[15px] font-medium tabular-nums text-foreground">
+        <span className="text-lg font-medium tabular-nums text-foreground">
           {formatCurrency(deal.amount)}
         </span>
         {deal.expectedCloseDate && (
-          <span className="text-[11px] tabular-nums text-muted-foreground">
+          <span className="text-xs tabular-nums text-muted-foreground">
             {formatDate(deal.expectedCloseDate)}
           </span>
         )}
@@ -44,12 +44,12 @@ export function PipelineBoard({ deals, contacts, onDealAdded }: PipelineBoardPro
   return (
     <>
       <div className="flex items-center justify-between px-6 pb-4">
-        <span className="text-[12px] tabular-nums text-muted-foreground">
+        <span className="text-sm tabular-nums text-muted-foreground">
           {activeDeals.length} active deals
         </span>
         <Button
           size="sm"
-          className="h-7 rounded-md bg-foreground px-3 text-[12px] font-normal text-background hover:bg-foreground/90"
+          className="h-7 rounded-md bg-foreground px-3 text-sm font-normal text-background hover:bg-foreground/90"
           onClick={() => setAddOpen(true)}
         >
           New deal
@@ -62,18 +62,18 @@ export function PipelineBoard({ deals, contacts, onDealAdded }: PipelineBoardPro
           const stageTotal = stageDeals.reduce((sum, d) => sum + d.amount, 0)
 
           return (
-            <div key={stageKey} className="flex w-48 flex-shrink-0 flex-col">
+            <div key={stageKey} className="flex w-60 flex-shrink-0 flex-col">
               <div className="mb-2 flex items-baseline justify-between px-3">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-[12px] text-muted-foreground">
+                  <span className="text-sm text-muted-foreground">
                     {stageLabels[stageKey]}
                   </span>
-                  <span className="text-[11px] tabular-nums text-muted-foreground/60">
+                  <span className="text-xs tabular-nums text-muted-foreground/60">
                     {stageDeals.length}
                   </span>
                 </div>
                 {stageDeals.length > 0 && (
-                  <span className="text-[11px] tabular-nums text-muted-foreground/60">
+                  <span className="text-xs tabular-nums text-muted-foreground/60">
                     {formatCurrency(stageTotal)}
                   </span>
                 )}
@@ -89,7 +89,7 @@ export function PipelineBoard({ deals, contacts, onDealAdded }: PipelineBoardPro
                   stageDeals.map((deal) => <DealCard key={deal.id} deal={deal} contacts={contacts} />)
                 ) : (
                   <div className="flex items-center justify-center py-12">
-                    <p className="text-[11px] text-muted-foreground/50">No deals</p>
+                    <p className="text-xs text-muted-foreground/50">No deals</p>
                   </div>
                 )}
               </div>

@@ -25,7 +25,7 @@ export function CrmNav({ activeView, onNavigate }: CrmNavProps) {
         <button
           type="button"
           onClick={() => onNavigate("overview")}
-          className="text-[13px] font-semibold tracking-tight text-foreground"
+          className="text-base font-semibold tracking-tight text-foreground"
         >
           anvil
         </button>
@@ -43,7 +43,7 @@ export function CrmNav({ activeView, onNavigate }: CrmNavProps) {
                 type="button"
                 onClick={() => onNavigate(item.id)}
                 className={cn(
-                  "relative rounded-md px-3 py-1.5 text-[13px] transition-colors",
+                  "relative rounded-md px-3 py-1.5 text-base transition-colors",
                   isActive
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -59,15 +59,9 @@ export function CrmNav({ activeView, onNavigate }: CrmNavProps) {
         </nav>
       </div>
 
-      {/* Right side */}
-      <div className="flex items-center gap-4">
-        <span className="text-[12px] text-muted-foreground">
-          {formatDate(new Date().toISOString())}
-        </span>
-        <div className="h-7 w-7 rounded-full bg-secondary text-[10px] font-medium text-muted-foreground flex items-center justify-center">
-          JD
-        </div>
-      </div>
+      <span className="text-sm text-muted-foreground">
+        {formatDate(new Date().toISOString())}
+      </span>
     </header>
   )
 }

@@ -17,11 +17,11 @@ export function PageHeader({ title, description, children, className }: PageHead
       )}
     >
       <div>
-        <h1 className="text-[20px] font-medium tracking-tight text-foreground">
+        <h1 className="text-xl font-medium tracking-tight text-foreground">
           {title}
         </h1>
         {description && (
-          <p className="mt-1 text-[12px] text-muted-foreground">{description}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         )}
       </div>
       {children && <div className="flex items-center gap-2">{children}</div>}

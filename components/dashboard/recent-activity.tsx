@@ -14,9 +14,9 @@ export function RecentActivity({ activities, contacts }: RecentActivityProps) {
 
   return (
     <div>
-      <p className="text-[12px] text-muted-foreground">Recent activity</p>
+      <p className="text-sm text-muted-foreground">Recent activity</p>
       {sorted.length === 0 ? (
-        <p className="mt-6 text-[13px] text-muted-foreground/50">No activity logged yet</p>
+        <p className="mt-6 text-base text-muted-foreground/50">No activity logged yet</p>
       ) : (
         <div className="mt-4 flex flex-col">
           {sorted.slice(0, 6).map((activity, i) => (
@@ -27,17 +27,17 @@ export function RecentActivity({ activities, contacts }: RecentActivityProps) {
                 i < Math.min(sorted.length, 6) - 1 && "border-b border-border"
               )}
             >
-              <span className="w-14 flex-shrink-0 text-[11px] capitalize text-muted-foreground">
+              <span className="w-14 flex-shrink-0 text-xs capitalize text-muted-foreground">
                 {activity.type}
               </span>
-              <p className="min-w-0 flex-1 truncate text-[13px] text-foreground">
+              <p className="min-w-0 flex-1 truncate text-base text-foreground">
                 {activity.title}
               </p>
               <div className="flex flex-shrink-0 items-center gap-4">
                 {activity.completed && (
-                  <span className="text-[11px] text-emerald-400">Done</span>
+                  <span className="text-xs text-success">Done</span>
                 )}
-                <span className="text-[11px] tabular-nums text-muted-foreground">
+                <span className="text-xs tabular-nums text-muted-foreground">
                   {getRelativeDate(activity.createdAt)}
                 </span>
               </div>

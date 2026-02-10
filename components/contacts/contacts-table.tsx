@@ -6,6 +6,8 @@ import type { Contact, ContactStatus, Deal, Activity } from "@/lib/crm-data"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ContactDetail } from "./contact-detail"
 import { AddContactDialog } from "./add-contact-dialog"
 
@@ -50,7 +52,7 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
               type="button"
               onClick={() => setStatusFilter(filter.value)}
               className={cn(
-                "rounded-md px-2.5 py-1.5 text-[12px] transition-colors",
+                "rounded-md px-2.5 py-1.5 text-sm transition-colors",
                 statusFilter === filter.value
                   ? "bg-secondary text-foreground"
                   : "text-muted-foreground hover:text-foreground"
@@ -65,11 +67,11 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
             placeholder="Search contacts..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-8 w-52 border-border bg-secondary text-[12px] text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-foreground/20"
+            className="h-8 w-52 text-sm"
           />
           <Button
             size="sm"
-            className="h-7 rounded-md bg-foreground px-3 text-[12px] font-normal text-background hover:bg-foreground/90"
+            className="h-7 rounded-md bg-foreground px-3 text-sm font-normal text-background hover:bg-foreground/90"
             onClick={() => setAddOpen(true)}
           >
             New contact
@@ -81,76 +83,73 @@ export function ContactsTable({ contacts, deals, activities, onContactAdded }: C
       <div className="px-6 pb-8">
         {contacts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <p className="text-[14px] text-muted-foreground">No contacts yet</p>
-            <p className="mt-1 text-[12px] text-muted-foreground/50">
+            <p className="text-sm text-muted-foreground">No contacts yet</p>
+            <p className="mt-1 text-sm text-muted-foreground/50">
               Add your first contact to get started
             </p>
           </div>
         ) : (
           <>
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
+            <Table>
+              <TableHeader>
+                <TableRow>
                   {["Name", "Company", "Status", "Last contact"].map((header) => (
-                    <th key={header} className="px-3 py-2.5 text-left">
-                      <span className="text-[11px] text-muted-foreground">{header}</span>
-                    </th>
+                    <TableHead key={header}>{header}</TableHead>
                   ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((contact, i) => (
-                  <tr
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((contact) => (
+                  <TableRow
                     key={contact.id}
                     onClick={() => setSelectedContact(contact)}
-                    className={cn(
-                      "cursor-pointer transition-colors hover:bg-secondary/50",
-                      i < filtered.length - 1 && "border-b border-border"
-                    )}
+                    className="cursor-pointer"
                   >
-                    <td className="px-3 py-3">
+                    <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-secondary text-[10px] font-medium text-muted-foreground">
-                          {contact.avatar}
-                        </div>
+                        <Avatar className="h-7 w-7">
+                          <AvatarFallback className="bg-secondary text-2xs font-medium text-muted-foreground">
+                            {contact.avatar}
+                          </AvatarFallback>
+                        </Avatar>
                         <div>
-                          <p className="text-[13px] text-foreground">{contact.name}</p>
-                          <p className="text-[11px] text-muted-foreground">{contact.email}</p>
+                          <p className="text-base text-foreground">{contact.name}</p>
+                          <p className="text-xs text-muted-foreground">{contact.email}</p>
                         </div>
                       </div>
-                    </td>
-                    <td className="px-3 py-3">
-                      <p className="text-[13px] text-foreground">{contact.company}</p>
-                      <p className="text-[11px] text-muted-foreground">{contact.role}</p>
-                    </td>
-                    <td className="px-3 py-3">
+                    </TableCell>
+                    <TableCell>
+                      <p className="text-base text-foreground">{contact.company}</p>
+                      <p className="text-xs text-muted-foreground">{contact.role}</p>
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center gap-2">
                         <div
                           className={cn(
                             "h-1.5 w-1.5 rounded-full",
-                            contact.status === "customer" && "bg-emerald-400",
+                            contact.status === "customer" && "bg-success",
                             contact.status === "prospect" && "bg-foreground/40",
                             contact.status === "lead" && "bg-primary",
-                            contact.status === "churned" && "bg-red-400"
+                            contact.status === "churned" && "bg-destructive"
                           )}
                         />
-                        <span className="text-[12px] capitalize text-muted-foreground">
+                        <span className="text-sm capitalize text-muted-foreground">
                           {contact.status}
                         </span>
                       </div>
-                    </td>
-                    <td className="px-3 py-3">
-                      <span className="text-[12px] tabular-nums text-muted-foreground">
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm tabular-nums text-muted-foreground">
                         {getRelativeDate(contact.lastContact)}
                       </span>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
             {filtered.length === 0 && (
               <div className="flex items-center justify-center py-16">
-                <p className="text-[13px] text-muted-foreground">No contacts found</p>
+                <p className="text-base text-muted-foreground">No contacts found</p>
               </div>
             )}
           </>
