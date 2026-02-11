@@ -5,6 +5,7 @@ import {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
   type ReactNode,
 } from "react";
 import type { Contact } from "@/lib/crm-data";
@@ -273,7 +274,7 @@ export function CompanyChatbot({
   const [thinkingPhase, setThinkingPhase] = useState(0);
   const [hideFirstPrompt, setHideFirstPrompt] = useState(false);
   const [savedBrief, setSavedBrief] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const contactRef = useRef(contact);
   const abortRef = useRef(false);
   const thinkingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
@@ -282,8 +283,12 @@ export function CompanyChatbot({
 
   contactRef.current = contact;
 
+  /* Auto-scroll: use scrollTop instead of scrollIntoView to avoid layout thrashing */
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = scrollRef.current;
+    if (el) {
+      el.scrollTop = el.scrollHeight;
+    }
   }, [messages, loading, streamingText]);
 
   const startThinking = useCallback(() => {
@@ -363,7 +368,6 @@ export function CompanyChatbot({
     persistBrief: boolean,
   ) {
     const c = contactRef.current;
-    // Capture contact identity at call time so the save targets the right row
     const capturedContactId = c.id;
     const capturedWebsite = c.website;
     const supabase = createBrowserClient();
@@ -451,11 +455,12 @@ export function CompanyChatbot({
                 }
               }
             } catch {
-              // skip
+              // skip malformed SSE lines
             }
           }
         }
 
+        // Safety net after stream ends
         if (responseText && !abortRef.current) {
           setMessages((prev) => {
             const last = prev[prev.length - 1];
@@ -478,9 +483,6 @@ export function CompanyChatbot({
         }
       }
 
-      // Persist the initial brief to Supabase — always save if we got text,
-      // even if the component is unmounting (the brief was successfully generated).
-      // Uses captured contact values so it saves to the correct row.
       if (persistBrief && responseText) {
         if (!abortRef.current) {
           setSavedBrief(responseText);
@@ -523,7 +525,6 @@ export function CompanyChatbot({
       };
     }
 
-    // Try loading persisted brief from Supabase
     let cancelled = false;
 
     async function init() {
@@ -532,10 +533,8 @@ export function CompanyChatbot({
       if (cancelled) return;
 
       if (brief) {
-        // Restore the saved brief
         setSavedBrief(brief);
         const restored: Message[] = [{ role: "assistant", content: brief }];
-        // Also restore any follow-up messages from session cache
         const followUps = followUpCache.get(contact.id);
         if (followUps) {
           restored.push(...followUps);
@@ -543,7 +542,6 @@ export function CompanyChatbot({
         setMessages(restored);
         setHideFirstPrompt(false);
       } else {
-        // No saved brief — fetch from Gemini
         const prompt = `Analyse ${contact.company}'s website (${contact.website}) and provide a brief on who they are, what they do, and how Anvil's services could align with their needs.`;
         const initial: Message[] = [{ role: "user", content: prompt }];
         setMessages(initial);
@@ -570,7 +568,6 @@ export function CompanyChatbot({
   /* ---- Save follow-up messages to session cache ---- */
   useEffect(() => {
     if (savedBrief && messages.length > 1) {
-      // Everything after the first assistant message (the brief) is follow-ups
       const followUps = messages.slice(1);
       if (followUps.length > 0) {
         followUpCache.set(contact.id, followUps);
@@ -613,6 +610,39 @@ export function CompanyChatbot({
   }
 
   const hasWebsite = !!contact.website;
+
+  /* ---- Memoize rendered messages so they don't re-parse on stream updates ---- */
+  const renderedMessages = useMemo(
+    () =>
+      messages.map((message, i) => (
+        <div
+          key={i}
+          className={cn(
+            "min-w-0",
+            i === 0 && hideFirstPrompt && message.role === "user" && "hidden",
+          )}
+        >
+          {message.role === "assistant" ? (
+            <div className="min-w-0 break-words">
+              {renderMarkdown(message.content)}
+            </div>
+          ) : (
+            <div className="flex justify-end">
+              <p className="max-w-[85%] rounded-xl bg-white/[0.05] px-4 py-3 text-sm text-white/50">
+                {message.content}
+              </p>
+            </div>
+          )}
+        </div>
+      )),
+    [messages, hideFirstPrompt],
+  );
+
+  /* ---- Memoize streaming markdown so it only re-parses when streamingText changes ---- */
+  const renderedStreaming = useMemo(() => {
+    if (!streamingText) return null;
+    return renderMarkdown(streamingText);
+  }, [streamingText]);
 
   /* ---- Shared inner content (used in both modes) ---- */
   const headerContent = (
@@ -680,6 +710,7 @@ export function CompanyChatbot({
 
   const messagesContent = (
     <div
+      ref={scrollRef}
       className={cn(
         "flex-1 overflow-y-auto pt-6 pb-4 min-w-0 overscroll-contain",
         embedded ? "px-5" : "px-7",
@@ -720,36 +751,11 @@ export function CompanyChatbot({
         </div>
       ) : (
         <div className="flex flex-col gap-6 min-w-0">
-          {messages.map((message, i) => (
-            <div
-              key={i}
-              className={cn(
-                "min-w-0",
-                i === 0 &&
-                  hideFirstPrompt &&
-                  message.role === "user" &&
-                  "hidden",
-              )}
-            >
-              {message.role === "assistant" ? (
-                <div className="min-w-0 break-words">
-                  {renderMarkdown(message.content)}
-                </div>
-              ) : (
-                <div className="flex justify-end">
-                  <p className="max-w-[85%] rounded-xl bg-white/[0.05] px-4 py-3 text-sm text-white/50">
-                    {message.content}
-                  </p>
-                </div>
-              )}
-            </div>
-          ))}
+          {renderedMessages}
 
-          {/* Streaming text */}
-          {streamingText && (
-            <div className="min-w-0 break-words">
-              {renderMarkdown(streamingText)}
-            </div>
+          {/* Streaming text with formatted markdown */}
+          {renderedStreaming && (
+            <div className="min-w-0 break-words">{renderedStreaming}</div>
           )}
 
           {/* Thinking indicator */}
@@ -762,8 +768,6 @@ export function CompanyChatbot({
               </span>
             </div>
           )}
-
-          <div ref={messagesEndRef} />
         </div>
       )}
     </div>
