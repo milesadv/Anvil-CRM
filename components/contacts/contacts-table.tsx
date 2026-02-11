@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ContactDetail } from "./contact-detail";
-import { CompanyChatbot } from "./company-chatbot";
+import { CompanyIntel } from "./company-intel";
 import { AddContactDialog } from "./add-contact-dialog";
 import { EditContactDialog } from "./edit-contact-dialog";
 
@@ -223,7 +223,7 @@ export function ContactsTable({
       )}
 
       {/* Chatbot panel — slides in from left when contact is selected */}
-      {selectedContact && <CompanyChatbot contact={selectedContact} />}
+      {selectedContact && <CompanyIntel contact={selectedContact} />}
 
       <ContactDetail
         contact={selectedContact}
@@ -238,7 +238,7 @@ export function ContactsTable({
         activities={activities}
         mobileIntel={
           selectedContact ? (
-            <CompanyChatbot contact={selectedContact} embedded />
+            <CompanyIntel contact={selectedContact} embedded />
           ) : undefined
         }
       />

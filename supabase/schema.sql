@@ -64,6 +64,7 @@ create table if not exists public.company_intel (
   contact_id uuid references public.contacts(id) on delete cascade,
   brief text not null default '',
   website_used text not null default '',
+  sections jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique(user_id, contact_id)

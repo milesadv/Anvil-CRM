@@ -131,6 +131,7 @@ export type Database = {
           contact_id: string;
           brief: string;
           website_used: string;
+          sections: Record<string, { content: string; generated_at: string }>;
           created_at: string;
           updated_at: string;
         };
@@ -140,6 +141,7 @@ export type Database = {
           contact_id: string;
           brief: string;
           website_used?: string;
+          sections?: Record<string, { content: string; generated_at: string }>;
           created_at?: string;
           updated_at?: string;
         };
@@ -149,6 +151,7 @@ export type Database = {
           contact_id?: string;
           brief?: string;
           website_used?: string;
+          sections?: Record<string, { content: string; generated_at: string }>;
           created_at?: string;
           updated_at?: string;
         };
