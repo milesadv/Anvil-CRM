@@ -375,6 +375,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
   const [sections, setSections] = useState<Record<string, string>>({});
   const [sectionLoading, setSectionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isStale, setIsStale] = useState(false);
   const [thinkingPhase, setThinkingPhase] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const cancelledRef = useRef(false);
@@ -382,6 +383,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
   const thinkingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
     null,
   );
+  const lastRefreshRef = useRef(0);
 
   /* Auto-scroll */
   useEffect(() => {
@@ -410,11 +412,12 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
   async function loadIntel(): Promise<{
     brief: string;
     sections: Record<string, string>;
+    isStale: boolean;
   } | null> {
     const supabase = createBrowserClient();
     const { data, error: err } = await supabase
       .from("company_intel")
-      .select("brief, sections")
+      .select("brief, sections, website_used")
       .eq("contact_id", contact.id)
       .order("updated_at", { ascending: false })
       .limit(1)
@@ -428,7 +431,9 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
     for (const [key, val] of Object.entries(rawSections)) {
       if (val?.content) parsed[key] = val.content;
     }
-    return { brief: data.brief, sections: parsed };
+    const isStale =
+      !!data.website_used && data.website_used !== contact.website;
+    return { brief: data.brief, sections: parsed, isStale };
   }
 
   async function saveIntel(
@@ -597,6 +602,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
     setSections({});
     setSectionLoading(null);
     setError(null);
+    setIsStale(false);
     stopThinking();
 
     if (!contact.website) return;
@@ -610,9 +616,9 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
       if (intel) {
         setBrief(intel.brief);
         setSections(intel.sections);
-      } else {
-        generateBrief();
+        setIsStale(intel.isStale);
       }
+      // No cache — don't auto-generate. User can click "Generate".
     }
 
     init();
@@ -629,9 +635,13 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
 
   async function handleRefresh() {
     if (briefLoading || sectionLoading || !contact.website) return;
+    const now = Date.now();
+    if (now - lastRefreshRef.current < 500) return;
+    lastRefreshRef.current = now;
     setBrief(null);
     setSections({});
     setError(null);
+    setIsStale(false);
     await generateBrief();
   }
 
@@ -766,10 +776,42 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
               </button>
             </div>
           ) : brief ? (
-            <div className="min-w-0 break-words">{renderMarkdown(brief)}</div>
+            <div className="min-w-0 break-words">
+              {isStale && (
+                <div className="mb-4 rounded-lg border border-amber-500/10 bg-amber-500/[0.04] px-4 py-3">
+                  <p className="text-xs text-amber-400/50">
+                    Website has changed since this was generated.{" "}
+                    <button
+                      type="button"
+                      onClick={handleRefresh}
+                      disabled={briefLoading || !!sectionLoading}
+                      className="underline underline-offset-2 hover:text-amber-400/70 transition-colors disabled:opacity-40"
+                    >
+                      Regenerate
+                    </button>
+                  </p>
+                </div>
+              )}
+              {renderMarkdown(brief)}
+            </div>
           ) : (
-            <div className="flex h-32 items-center justify-center">
-              <span className="text-sm text-white/20">Loading brief...</span>
+            <div className="flex h-full items-center justify-center">
+              <div className="text-center">
+                <p className="text-sm text-white/25 mb-1">
+                  Generate Company Intel
+                </p>
+                <p className="text-xs text-white/12 mb-4">
+                  Analyse {contact.company || "this company"}&apos;s website
+                  with AI
+                </p>
+                <button
+                  type="button"
+                  onClick={() => generateBrief()}
+                  className="text-xs font-medium text-white/40 hover:text-white/60 transition-colors border border-white/[0.08] hover:border-white/[0.15] rounded-lg px-4 py-2"
+                >
+                  Generate
+                </button>
+              </div>
             </div>
           )}
 
