@@ -23,6 +23,7 @@ function mapContact(row: Record<string, unknown>): Contact {
     role: row.role as string,
     phone: row.phone as string,
     website: (row.website as string) ?? "",
+    linkedin: (row.linkedin as string) ?? "",
     status: row.status as Contact["status"],
     lastContact: row.last_contact as string,
     avatar: row.avatar as string,

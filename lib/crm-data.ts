@@ -11,6 +11,7 @@ export interface Contact {
   role: string;
   phone: string;
   website: string;
+  linkedin: string;
   status: ContactStatus;
   lastContact: string;
   avatar: string;

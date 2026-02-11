@@ -141,10 +141,11 @@ export function ContactDetail({
             <div className="mt-6 px-5 sm:px-7">
               <div className="space-y-0">
                 {[
-                  { label: "Email", value: contact.email },
-                  { label: "Phone", value: contact.phone },
-                  { label: "Website", value: contact.website },
-                  { label: "Company", value: contact.company },
+                  { label: "Email", value: contact.email, link: false },
+                  { label: "Phone", value: contact.phone, link: false },
+                  { label: "Website", value: contact.website, link: true },
+                  { label: "LinkedIn", value: contact.linkedin, link: true },
+                  { label: "Company", value: contact.company, link: false },
                 ]
                   .filter((item) => item.value)
                   .map((item) => (
@@ -155,7 +156,7 @@ export function ContactDetail({
                       <span className="text-xs uppercase tracking-[0.1em] text-white/20">
                         {item.label}
                       </span>
-                      {item.label === "Website" ? (
+                      {item.link ? (
                         <a
                           href={
                             item.value.startsWith("http")
@@ -203,12 +204,27 @@ export function ContactDetail({
                   href: `tel:${contact.phone}`,
                   tag: "a" as const,
                 },
+                ...(contact.linkedin
+                  ? [
+                      {
+                        label: "LinkedIn",
+                        href: contact.linkedin.startsWith("http")
+                          ? contact.linkedin
+                          : `https://${contact.linkedin}`,
+                        tag: "a" as const,
+                        external: true,
+                      },
+                    ]
+                  : []),
                 { label: "Edit", onClick: onEdit, tag: "button" as const },
               ].map((action) =>
                 action.tag === "a" ? (
                   <a
                     key={action.label}
                     href={action.href}
+                    {...("external" in action && action.external
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
                     className="flex-1 rounded-lg border border-white/[0.06] py-2.5 text-center text-sm font-medium text-white/40 transition-all duration-200 hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white/65"
                   >
                     {action.label}

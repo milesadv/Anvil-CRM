@@ -38,6 +38,7 @@ export function AddContactDialog({
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
   const [website, setWebsite] = useState("");
+  const [linkedin, setLinkedin] = useState("");
   const [role, setRole] = useState("");
   const [status, setStatus] = useState<
     "lead" | "prospect" | "customer" | "churned"
@@ -52,6 +53,7 @@ export function AddContactDialog({
     setPhone("");
     setCompany("");
     setWebsite("");
+    setLinkedin("");
     setRole("");
     setStatus("lead");
     setNotes("");
@@ -77,6 +79,7 @@ export function AddContactDialog({
       phone,
       company,
       website,
+      linkedin,
       role,
       status,
       avatar,
@@ -176,6 +179,18 @@ export function AddContactDialog({
               placeholder="https://example.co.uk"
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="linkedin" className="text-xs text-muted-foreground">
+              LinkedIn
+            </Label>
+            <Input
+              id="linkedin"
+              type="url"
+              placeholder="https://linkedin.com/in/sarahchen"
+              value={linkedin}
+              onChange={(e) => setLinkedin(e.target.value)}
             />
           </div>
           <div className="flex flex-col gap-1.5">
