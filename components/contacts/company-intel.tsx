@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, type ReactNode } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  type ReactNode,
+} from "react";
 import type { Contact } from "@/lib/crm-data";
 import { createBrowserClient } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
@@ -65,74 +71,121 @@ function renderMarkdown(md: string): ReactNode[] {
   let key = 0;
 
   function inlineFormat(text: string): ReactNode {
+    // Single-pass scan to find all inline tokens without catastrophic backtracking
+    const tokens: {
+      type: string;
+      index: number;
+      length: number;
+      groups: string[];
+    }[] = [];
+
+    // Bold: **text**
+    const boldRe = /\*\*(.+?)\*\*/g;
+    let m: RegExpExecArray | null;
+    while ((m = boldRe.exec(text)) !== null) {
+      tokens.push({
+        type: "bold",
+        index: m.index,
+        length: m[0].length,
+        groups: [m[1]],
+      });
+    }
+
+    // Code: `text`
+    const codeRe = /`(.+?)`/g;
+    while ((m = codeRe.exec(text)) !== null) {
+      tokens.push({
+        type: "code",
+        index: m.index,
+        length: m[0].length,
+        groups: [m[1]],
+      });
+    }
+
+    // Link: [text](url)
+    const linkRe = /\[(.+?)\]\((.+?)\)/g;
+    while ((m = linkRe.exec(text)) !== null) {
+      tokens.push({
+        type: "link",
+        index: m.index,
+        length: m[0].length,
+        groups: [m[1], m[2]],
+      });
+    }
+
+    // Italic: *text* (single asterisk, not inside bold)
+    // Use a simple regex without lookbehinds to avoid backtracking
+    const italicRe = /\*([^*]+)\*/g;
+    while ((m = italicRe.exec(text)) !== null) {
+      tokens.push({
+        type: "italic",
+        index: m.index,
+        length: m[0].length,
+        groups: [m[1]],
+      });
+    }
+
+    // Sort by position and remove overlapping tokens (keep earliest/longest)
+    tokens.sort((a, b) => a.index - b.index || b.length - a.length);
+    const filtered: typeof tokens = [];
+    let lastEnd = 0;
+    for (const token of tokens) {
+      if (token.index >= lastEnd) {
+        filtered.push(token);
+        lastEnd = token.index + token.length;
+      }
+    }
+
+    if (filtered.length === 0) return text;
+
     const parts: ReactNode[] = [];
-    let remaining = text;
     let partKey = 0;
+    let cursor = 0;
 
-    while (remaining.length > 0) {
-      const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
-      const italicMatch = remaining.match(
-        /(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/,
-      );
-      const codeMatch = remaining.match(/`(.+?)`/);
-      const linkMatch = remaining.match(/\[(.+?)\]\((.+?)\)/);
-
-      const matches = [
-        boldMatch ? { type: "bold", match: boldMatch } : null,
-        italicMatch ? { type: "italic", match: italicMatch } : null,
-        codeMatch ? { type: "code", match: codeMatch } : null,
-        linkMatch ? { type: "link", match: linkMatch } : null,
-      ]
-        .filter(Boolean)
-        .sort((a, b) => a!.match.index! - b!.match.index!);
-
-      if (matches.length === 0) {
-        parts.push(remaining);
-        break;
+    for (const token of filtered) {
+      if (token.index > cursor) {
+        parts.push(text.slice(cursor, token.index));
       }
 
-      const first = matches[0]!;
-      const idx = first.match.index!;
-
-      if (idx > 0) {
-        parts.push(remaining.slice(0, idx));
-      }
-
-      if (first.type === "bold") {
+      if (token.type === "bold") {
         parts.push(
           <strong key={partKey++} className="font-semibold text-white/60">
-            {first.match[1]}
+            {token.groups[0]}
           </strong>,
         );
-      } else if (first.type === "italic") {
+      } else if (token.type === "italic") {
         parts.push(
           <em key={partKey++} className="italic text-white/45">
-            {first.match[1]}
+            {token.groups[0]}
           </em>,
         );
-      } else if (first.type === "code") {
+      } else if (token.type === "code") {
         parts.push(
           <code
             key={partKey++}
             className="text-[13px] text-white/50 bg-white/[0.05] px-1.5 py-0.5 rounded"
           >
-            {first.match[1]}
+            {token.groups[0]}
           </code>,
         );
-      } else if (first.type === "link") {
+      } else if (token.type === "link") {
         parts.push(
           <a
             key={partKey++}
-            href={first.match[2]}
+            href={token.groups[1]}
             target="_blank"
             rel="noopener noreferrer"
             className="text-white/50 underline underline-offset-2 decoration-white/15 hover:text-white/70 transition-colors"
           >
-            {first.match[1]}
+            {token.groups[0]}
           </a>,
         );
       }
-      remaining = remaining.slice(idx + first.match[0].length);
+      cursor = token.index + token.length;
+    }
+
+    if (cursor < text.length) {
+      parts.push(text.slice(cursor));
     }
 
     return parts.length === 1 ? parts[0] : <>{parts}</>;
@@ -325,6 +378,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
   const [thinkingPhase, setThinkingPhase] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const cancelledRef = useRef(false);
+  const abortRef = useRef<AbortController | null>(null);
   const thinkingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
     null,
   );
@@ -398,10 +452,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
       };
     }
 
-    await supabase
-      .from("company_intel")
-      .delete()
-      .eq("contact_id", contact.id);
+    await supabase.from("company_intel").delete().eq("contact_id", contact.id);
 
     await supabase.from("company_intel").insert({
       user_id: user.id,
@@ -446,6 +497,11 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+    // Cancel any in-flight request before starting a new one
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     const res = await fetch(`${supabaseUrl}/functions/v1/Sales-Chat`, {
       method: "POST",
       headers: {
@@ -461,6 +517,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
         messages,
         stream: false,
       }),
+      signal: controller.signal,
     });
 
     const data = await res.json();
@@ -487,7 +544,13 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
       }
     } catch (err) {
       if (!cancelledRef.current) {
-        setError(err instanceof Error ? err.message : "Failed to generate brief");
+        const isAbort =
+          err instanceof DOMException && err.name === "AbortError";
+        if (!isAbort) {
+          setError(
+            err instanceof Error ? err.message : "Failed to generate brief",
+          );
+        }
       }
     } finally {
       stopThinking();
@@ -557,6 +620,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
     return () => {
       cancelled = true;
       cancelledRef.current = true;
+      abortRef.current?.abort();
       stopThinking();
     };
   }, [contact.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -634,9 +698,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
           )}
         </div>
       </div>
-      <div
-        className={cn(embedded ? "mx-5" : "mx-7", "h-px bg-white/[0.05]")}
-      />
+      <div className={cn(embedded ? "mx-5" : "mx-7", "h-px bg-white/[0.05]")} />
     </>
   );
 
@@ -704,9 +766,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
               </button>
             </div>
           ) : brief ? (
-            <div className="min-w-0 break-words">
-              {renderMarkdown(brief)}
-            </div>
+            <div className="min-w-0 break-words">{renderMarkdown(brief)}</div>
           ) : (
             <div className="flex h-32 items-center justify-center">
               <span className="text-sm text-white/20">Loading brief...</span>

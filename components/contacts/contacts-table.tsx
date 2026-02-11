@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getRelativeDate } from "@/lib/crm-data";
 import type { Contact, ContactStatus, Deal, Activity } from "@/lib/crm-data";
 import { cn } from "@/lib/utils";
@@ -49,6 +49,15 @@ export function ContactsTable({
   const [addOpen, setAddOpen] = useState(false);
   const [editContact, setEditContact] = useState<Contact | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 640px)");
+    setIsDesktop(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
 
   const filtered = contacts.filter((c) => {
     const q = search.toLowerCase();
@@ -227,8 +236,10 @@ export function ContactsTable({
         />
       )}
 
-      {/* Chatbot panel — slides in from left when contact is selected */}
-      {selectedContact && <CompanyIntel contact={selectedContact} />}
+      {/* Chatbot panel — desktop: standalone side panel, mobile: embedded in contact detail */}
+      {selectedContact && isDesktop && (
+        <CompanyIntel contact={selectedContact} />
+      )}
 
       <ContactDetail
         contact={selectedContact}
@@ -242,7 +253,7 @@ export function ContactsTable({
         deals={deals}
         activities={activities}
         mobileIntel={
-          selectedContact ? (
+          selectedContact && !isDesktop ? (
             <CompanyIntel contact={selectedContact} embedded />
           ) : undefined
         }
