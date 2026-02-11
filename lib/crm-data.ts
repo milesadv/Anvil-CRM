@@ -12,6 +12,7 @@ export interface Contact {
   phone: string;
   website: string;
   linkedin: string;
+  industry: string;
   status: ContactStatus;
   lastContact: string;
   avatar: string;

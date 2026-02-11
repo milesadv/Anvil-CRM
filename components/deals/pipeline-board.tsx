@@ -10,7 +10,10 @@ import {
 import type { Deal, DealStage, Contact } from "@/lib/crm-data";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AddDealDialog } from "./add-deal-dialog";
+import { EditDealDialog } from "./edit-deal-dialog";
+import { createBrowserClient } from "@/lib/supabase";
 
 const stageOrder: DealStage[] = [
   "discovery",
@@ -19,9 +22,26 @@ const stageOrder: DealStage[] = [
   "closing",
 ];
 
-function DealCard({ deal, contacts }: { deal: Deal; contacts: Contact[] }) {
+function DealCard({
+  deal,
+  contacts,
+  onEdit,
+  onMoveStage,
+}: {
+  deal: Deal;
+  contacts: Contact[];
+  onEdit: (deal: Deal) => void;
+  onMoveStage: (deal: Deal, direction: "prev" | "next") => void;
+}) {
+  const stageIdx = stageOrder.indexOf(deal.stage);
+  const canMoveLeft = stageIdx > 0;
+  const canMoveRight = stageIdx < stageOrder.length - 1;
+
   return (
-    <div className="border-b border-border/40 px-3.5 py-3 transition-all duration-150 last:border-0 hover:bg-white/[0.03] hover:pl-4">
+    <div
+      className="group cursor-pointer border-b border-border/40 px-3.5 py-3 transition-all duration-150 last:border-0 hover:bg-white/[0.03]"
+      onClick={() => onEdit(deal)}
+    >
       <p className="text-sm text-foreground">{deal.title}</p>
       <p className="mt-0.5 text-2xs text-muted-foreground/60">
         {getContactName(deal.contactId, contacts)}
@@ -35,6 +55,41 @@ function DealCard({ deal, contacts }: { deal: Deal; contacts: Contact[] }) {
             {formatDate(deal.expectedCloseDate)}
           </span>
         )}
+      </div>
+      {/* Stage movement arrows — visible on hover */}
+      <div className="mt-2 flex items-center justify-between opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+        <button
+          disabled={!canMoveLeft}
+          className={cn(
+            "flex items-center gap-1 rounded-md px-1.5 py-0.5 text-2xs transition-colors",
+            canMoveLeft
+              ? "text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+              : "cursor-default text-muted-foreground/20",
+          )}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (canMoveLeft) onMoveStage(deal, "prev");
+          }}
+        >
+          <ChevronLeft className="h-3 w-3" />
+          {canMoveLeft && <span>{stageLabels[stageOrder[stageIdx - 1]]}</span>}
+        </button>
+        <button
+          disabled={!canMoveRight}
+          className={cn(
+            "flex items-center gap-1 rounded-md px-1.5 py-0.5 text-2xs transition-colors",
+            canMoveRight
+              ? "text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+              : "cursor-default text-muted-foreground/20",
+          )}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (canMoveRight) onMoveStage(deal, "next");
+          }}
+        >
+          {canMoveRight && <span>{stageLabels[stageOrder[stageIdx + 1]]}</span>}
+          <ChevronRight className="h-3 w-3" />
+        </button>
       </div>
     </div>
   );
@@ -52,6 +107,30 @@ export function PipelineBoard({
   onDealAdded,
 }: PipelineBoardProps) {
   const [addOpen, setAddOpen] = useState(false);
+  const [editDeal, setEditDeal] = useState<Deal | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+
+  function handleEditDeal(deal: Deal) {
+    setEditDeal(deal);
+    setEditOpen(true);
+  }
+
+  async function handleMoveStage(deal: Deal, direction: "prev" | "next") {
+    const currentIdx = stageOrder.indexOf(deal.stage);
+    const newIdx = direction === "next" ? currentIdx + 1 : currentIdx - 1;
+    if (newIdx < 0 || newIdx >= stageOrder.length) return;
+
+    const newStage = stageOrder[newIdx];
+    const supabase = createBrowserClient();
+    const { error } = await supabase
+      .from("deals")
+      .update({ stage: newStage })
+      .eq("id", deal.id);
+
+    if (!error) {
+      onDealAdded(); // refreshAll
+    }
+  }
 
   return (
     <>
@@ -104,7 +183,13 @@ export function PipelineBoard({
               >
                 {stageDeals.length > 0 ? (
                   stageDeals.map((deal) => (
-                    <DealCard key={deal.id} deal={deal} contacts={contacts} />
+                    <DealCard
+                      key={deal.id}
+                      deal={deal}
+                      contacts={contacts}
+                      onEdit={handleEditDeal}
+                      onMoveStage={handleMoveStage}
+                    />
                   ))
                 ) : (
                   <div className="flex items-center justify-center py-14">
@@ -124,6 +209,14 @@ export function PipelineBoard({
         onOpenChange={setAddOpen}
         contacts={contacts}
         onDealAdded={onDealAdded}
+      />
+
+      <EditDealDialog
+        deal={editDeal}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        contacts={contacts}
+        onDealUpdated={onDealAdded}
       />
     </>
   );

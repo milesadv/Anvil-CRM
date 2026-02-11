@@ -146,6 +146,7 @@ export function ContactDetail({
                   { label: "Website", value: contact.website, link: true },
                   { label: "LinkedIn", value: contact.linkedin, link: true },
                   { label: "Company", value: contact.company, link: false },
+                  { label: "Industry", value: contact.industry, link: false },
                 ]
                   .filter((item) => item.value)
                   .map((item) => (

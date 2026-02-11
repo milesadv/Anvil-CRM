@@ -83,113 +83,145 @@ export function AddDealDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-border bg-card sm:max-w-[400px]">
+      <DialogContent className="border-border/60 bg-card sm:max-w-[420px]">
         <DialogHeader>
-          <DialogTitle className="text-lg font-medium text-foreground">
+          <DialogTitle className="text-base font-medium text-foreground">
             New deal
           </DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-3">
-          <div className="flex flex-col gap-1.5">
-            <Label
-              htmlFor="dealTitle"
-              className="text-xs text-muted-foreground"
-            >
-              Title
-            </Label>
-            <Input
-              id="dealTitle"
-              placeholder="Enterprise licence"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
+
+        <div className="space-y-5 py-2">
+          {/* Deal info */}
+          <fieldset className="space-y-3">
+            <legend className="text-2xs font-medium uppercase tracking-wider text-muted-foreground/50">
+              Deal info
+            </legend>
             <div className="flex flex-col gap-1.5">
               <Label
-                htmlFor="dealAmount"
+                htmlFor="dealTitle"
                 className="text-xs text-muted-foreground"
               >
-                {"Amount (\u00A3)"}
+                Title
               </Label>
               <Input
-                id="dealAmount"
-                type="number"
-                placeholder="50000"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                id="dealTitle"
+                placeholder="Enterprise licence"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="h-9 text-sm"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label
-                htmlFor="probability"
-                className="text-xs text-muted-foreground"
-              >
-                Probability (%)
-              </Label>
-              <Input
-                id="probability"
-                type="number"
-                placeholder="50"
-                value={probability}
-                onChange={(e) => setProbability(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label className="text-xs text-muted-foreground">Contact</Label>
-            <Select value={contactId} onValueChange={setContactId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select contact" />
-              </SelectTrigger>
-              <SelectContent>
-                {contacts.length > 0 ? (
-                  contacts.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name} -- {c.company}
+              <Label className="text-xs text-muted-foreground">Contact</Label>
+              <Select value={contactId} onValueChange={setContactId}>
+                <SelectTrigger className="h-9 text-sm">
+                  <SelectValue placeholder="Select contact" />
+                </SelectTrigger>
+                <SelectContent>
+                  {contacts.length > 0 ? (
+                    contacts.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name} &mdash; {c.company}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="none" disabled>
+                      No contacts available
                     </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="none" disabled>
-                    No contacts available
-                  </SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label className="text-xs text-muted-foreground">Stage</Label>
-            <Select
-              value={stage}
-              onValueChange={(v) => setStage(v as typeof stage)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="discovery">Discovery</SelectItem>
-                <SelectItem value="pricing">Pricing</SelectItem>
-                <SelectItem value="negotiating">Negotiating</SelectItem>
-                <SelectItem value="closing">Closing</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label
-              htmlFor="expectedCloseDate"
-              className="text-xs text-muted-foreground"
-            >
-              Expected close
-            </Label>
-            <Input
-              id="expectedCloseDate"
-              type="date"
-              value={expectedCloseDate}
-              onChange={(e) => setExpectedCloseDate(e.target.value)}
-            />
-          </div>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          </fieldset>
+
+          <div className="border-t border-border/30" />
+
+          {/* Financials */}
+          <fieldset className="space-y-3">
+            <legend className="text-2xs font-medium uppercase tracking-wider text-muted-foreground/50">
+              Financials
+            </legend>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <Label
+                  htmlFor="dealAmount"
+                  className="text-xs text-muted-foreground"
+                >
+                  Amount ({"\u00A3"})
+                </Label>
+                <Input
+                  id="dealAmount"
+                  type="number"
+                  placeholder="50000"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="h-9 text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label
+                  htmlFor="probability"
+                  className="text-xs text-muted-foreground"
+                >
+                  Probability (%)
+                </Label>
+                <Input
+                  id="probability"
+                  type="number"
+                  placeholder="50"
+                  value={probability}
+                  onChange={(e) => setProbability(e.target.value)}
+                  className="h-9 text-sm"
+                />
+              </div>
+            </div>
+          </fieldset>
+
+          <div className="border-t border-border/30" />
+
+          {/* Pipeline */}
+          <fieldset className="space-y-3">
+            <legend className="text-2xs font-medium uppercase tracking-wider text-muted-foreground/50">
+              Pipeline
+            </legend>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-xs text-muted-foreground">Stage</Label>
+                <Select
+                  value={stage}
+                  onValueChange={(v) => setStage(v as typeof stage)}
+                >
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="discovery">Discovery</SelectItem>
+                    <SelectItem value="pricing">Pricing</SelectItem>
+                    <SelectItem value="negotiating">Negotiating</SelectItem>
+                    <SelectItem value="closing">Closing</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label
+                  htmlFor="expectedCloseDate"
+                  className="text-xs text-muted-foreground"
+                >
+                  Expected close
+                </Label>
+                <Input
+                  id="expectedCloseDate"
+                  type="date"
+                  value={expectedCloseDate}
+                  onChange={(e) => setExpectedCloseDate(e.target.value)}
+                  className="h-9 text-sm"
+                />
+              </div>
+            </div>
+          </fieldset>
         </div>
-        <DialogFooter>
+
+        <DialogFooter className="gap-2 pt-1">
           <Button
             variant="outline"
             size="sm"

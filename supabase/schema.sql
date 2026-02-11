@@ -13,6 +13,7 @@ create table if not exists public.contacts (
   role text not null default '',
   phone text not null default '',
   website text not null default '',
+  industry text not null default '',
   status text not null default 'lead'
     check (status in ('lead', 'prospect', 'customer', 'churned')),
   last_contact date not null default current_date,

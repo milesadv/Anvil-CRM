@@ -51,10 +51,13 @@ export function ContactsTable({
   const [editOpen, setEditOpen] = useState(false);
 
   const filtered = contacts.filter((c) => {
+    const q = search.toLowerCase();
     const matchesSearch =
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.company.toLowerCase().includes(search.toLowerCase()) ||
-      c.email.toLowerCase().includes(search.toLowerCase());
+      c.name.toLowerCase().includes(q) ||
+      c.industry.toLowerCase().includes(q) ||
+      c.phone.toLowerCase().includes(q) ||
+      c.company.toLowerCase().includes(q) ||
+      c.email.toLowerCase().includes(q);
     const matchesStatus = statusFilter === "all" || c.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -82,7 +85,7 @@ export function ContactsTable({
         </div>
         <div className="flex items-center gap-2.5">
           <Input
-            placeholder="Search contacts..."
+            placeholder="Search name, industry, phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="h-8 min-w-0 flex-1 text-sm sm:w-52 sm:flex-none"
@@ -158,7 +161,9 @@ export function ContactsTable({
                         {contact.company}
                       </p>
                       <p className="text-2xs text-muted-foreground/60">
-                        {contact.role}
+                        {[contact.role, contact.industry]
+                          .filter(Boolean)
+                          .join(" · ")}
                       </p>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
