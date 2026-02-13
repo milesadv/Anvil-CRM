@@ -5,6 +5,7 @@ import {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
   type ReactNode,
 } from "react";
 import type { Contact } from "@/lib/crm-data";
@@ -79,8 +80,8 @@ function renderMarkdown(md: string): ReactNode[] {
       groups: string[];
     }[] = [];
 
-    // Bold: **text**
-    const boldRe = /\*\*(.+?)\*\*/g;
+    // Bold: **text** — negated class avoids O(n²) backtracking
+    const boldRe = /\*\*([^*]+)\*\*/g;
     let m: RegExpExecArray | null;
     while ((m = boldRe.exec(text)) !== null) {
       tokens.push({
@@ -91,8 +92,8 @@ function renderMarkdown(md: string): ReactNode[] {
       });
     }
 
-    // Code: `text`
-    const codeRe = /`(.+?)`/g;
+    // Code: `text` — negated class avoids O(n²) backtracking
+    const codeRe = /`([^`]+)`/g;
     while ((m = codeRe.exec(text)) !== null) {
       tokens.push({
         type: "code",
@@ -102,8 +103,8 @@ function renderMarkdown(md: string): ReactNode[] {
       });
     }
 
-    // Link: [text](url)
-    const linkRe = /\[(.+?)\]\((.+?)\)/g;
+    // Link: [text](url) — negated classes avoid O(n²) backtracking
+    const linkRe = /\[([^\]]+)\]\(([^)]+)\)/g;
     while ((m = linkRe.exec(text)) !== null) {
       tokens.push({
         type: "link",
@@ -199,39 +200,24 @@ function renderMarkdown(md: string): ReactNode[] {
       continue;
     }
 
-    if (line.startsWith("### ")) {
-      elements.push(
-        <h4
-          key={key++}
-          className="text-sm font-medium text-white/55 mt-4 mb-1.5 first:mt-0"
-        >
-          {inlineFormat(line.slice(4))}
-        </h4>,
-      );
-      i++;
-      continue;
-    }
-    if (line.startsWith("## ")) {
-      elements.push(
-        <h3
-          key={key++}
-          className="text-sm font-semibold text-white/60 mt-5 mb-2 first:mt-0"
-        >
-          {inlineFormat(line.slice(3))}
-        </h3>,
-      );
-      i++;
-      continue;
-    }
-    if (line.startsWith("# ")) {
-      elements.push(
-        <h2
-          key={key++}
-          className="text-[15px] font-semibold text-white/60 mt-5 mb-2 first:mt-0"
-        >
-          {inlineFormat(line.slice(2))}
-        </h2>,
-      );
+    if (/^#{1,6}\s/.test(line)) {
+      const match = line.match(/^(#{1,6})\s+(.*)$/);
+      if (match) {
+        const level = match[1].length;
+        const text = match[2];
+        const cls =
+          level <= 2
+            ? "text-[15px] font-semibold text-white/60 mt-5 mb-2 first:mt-0"
+            : level === 3
+              ? "text-sm font-semibold text-white/60 mt-5 mb-2 first:mt-0"
+              : "text-sm font-medium text-white/55 mt-4 mb-1.5 first:mt-0";
+        const Tag = (level <= 2 ? "h2" : level === 3 ? "h3" : "h4") as "h2";
+        elements.push(
+          <Tag key={key++} className={cls}>
+            {inlineFormat(text)}
+          </Tag>,
+        );
+      }
       i++;
       continue;
     }
@@ -309,7 +295,7 @@ function renderMarkdown(md: string): ReactNode[] {
     while (
       i < lines.length &&
       lines[i].trim() !== "" &&
-      !lines[i].startsWith("#") &&
+      !/^#{1,6}\s/.test(lines[i]) &&
       !lines[i].startsWith("> ") &&
       !/^[\s]*[-*+]\s/.test(lines[i]) &&
       !/^[\s]*\d+[.)]\s/.test(lines[i]) &&
@@ -327,6 +313,9 @@ function renderMarkdown(md: string): ReactNode[] {
           {inlineFormat(paraLines.join(" "))}
         </p>,
       );
+    } else {
+      // Safety: skip any unhandled line to prevent infinite loop
+      i++;
     }
   }
 
@@ -387,18 +376,11 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
 
   /* Auto-scroll */
   useEffect(() => {
-    const el = scrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [brief, sections, briefLoading, sectionLoading]);
-
-  const startThinking = useCallback(() => {
-    setThinkingPhase(0);
-    let phase = 0;
-    thinkingIntervalRef.current = setInterval(() => {
-      phase = (phase + 1) % THINKING_PHASES.length;
-      setThinkingPhase(phase);
-    }, 2800);
-  }, []);
+    requestAnimationFrame(() => {
+      const el = scrollRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
+    });
+  }, [brief, sections]);
 
   const stopThinking = useCallback(() => {
     if (thinkingIntervalRef.current) {
@@ -406,6 +388,16 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
       thinkingIntervalRef.current = null;
     }
   }, []);
+
+  const startThinking = useCallback(() => {
+    stopThinking();
+    setThinkingPhase(0);
+    let phase = 0;
+    thinkingIntervalRef.current = setInterval(() => {
+      phase = (phase + 1) % THINKING_PHASES.length;
+      setThinkingPhase(phase);
+    }, 2800);
+  }, [stopThinking]);
 
   /* ---- Supabase helpers ---- */
 
@@ -507,6 +499,11 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
     const controller = new AbortController();
     abortRef.current = controller;
 
+    const signal = AbortSignal.any([
+      controller.signal,
+      AbortSignal.timeout(60_000),
+    ]);
+
     const res = await fetch(`${supabaseUrl}/functions/v1/Sales-Chat`, {
       method: "POST",
       headers: {
@@ -522,7 +519,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
         messages,
         stream: false,
       }),
-      signal: controller.signal,
+      signal,
     });
 
     const data = await res.json();
@@ -533,6 +530,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
   /* ---- Generate brief ---- */
 
   async function generateBrief() {
+    if (briefLoading) return;
     setBriefLoading(true);
     setError(null);
     startThinking();
@@ -646,6 +644,21 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
   }
 
   const hasWebsite = !!contact.website;
+
+  /* ---- Memoised markdown ---- */
+
+  const briefMarkdown = useMemo(
+    () => (brief ? renderMarkdown(brief) : null),
+    [brief],
+  );
+
+  const sectionMarkdowns = useMemo(() => {
+    const result: Record<string, ReactNode[]> = {};
+    for (const [key, content] of Object.entries(sections)) {
+      result[key] = renderMarkdown(content);
+    }
+    return result;
+  }, [sections]);
 
   /* ---- JSX ---- */
 
@@ -792,7 +805,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
                   </p>
                 </div>
               )}
-              {renderMarkdown(brief)}
+              {briefMarkdown}
             </div>
           ) : (
             <div className="flex h-full items-center justify-center">
@@ -855,7 +868,7 @@ export function CompanyIntel({ contact, embedded = false }: CompanyIntelProps) {
                           {sectionDef.label}
                         </p>
                         <div className="min-w-0 break-words">
-                          {renderMarkdown(content)}
+                          {sectionMarkdowns[sectionDef.key]}
                         </div>
                       </div>
                     );

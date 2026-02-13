@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "shells": [
+    {
+      "tmuxName": "sidecar-sh-anvil-crm-1",
+      "displayName": "Shell 1",
+      "createdAt": "2026-02-12T13:03:15.329581Z",
+      "agentType": "claude"
+    },
+    {
+      "tmuxName": "sidecar-sh-anvil-crm-2",
+      "displayName": "Task Management Updates",
+      "createdAt": "2026-02-13T18:13:06.02969Z",
+      "agentType": "claude"
+    },
+    {
+      "tmuxName": "sidecar-sh-anvil-crm-3",
+      "displayName": "Dev Server",
+      "createdAt": "2026-02-13T18:15:55.767495Z"
+    }
+  ]
+}
